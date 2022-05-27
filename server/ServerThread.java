@@ -14,7 +14,7 @@ public class ServerThread extends Thread {
     Monster monster;
     boolean onTurn;
 
-    //　同時にクライアントに対応するためにServerThreadがクライアントに対応する。
+    // 同時にクライアントに対応するためにServerThreadがクライアントに対応する。
     // それぞれのサーバースレッドは敵のスレッド、自身のモンスター
     public ServerThread(Socket socket, ServerThread opponent, Monster monster, boolean onTurn) throws IOException {
         this.socket = socket;
@@ -38,7 +38,10 @@ public class ServerThread extends Thread {
             server.sendHim("\nYour opponent is " + this.monster.name, opponent);
             server.sendHim("\n---Game is starting now---", this);
             while (true) {
-                if (this.onTurn) {
+                while (true) {
+                        server.isTurn(this, opponent);
+                        if(this.onTurn) break;
+                    }
                     server.showTurn(this, opponent);
                     server.showMoveLineup(this);
                     s = in.readLine();
@@ -48,10 +51,9 @@ public class ServerThread extends Thread {
                     }
                     server.showCurrentHp(this, opponent);
                     server.changeTurn(this, opponent);
+                    server.isTurn(this, opponent);
+                    continue;
                 }
-                this.onTurn = server.isTurn(this);
-                opponent.onTurn = server.isTurn(opponent);
-            }
         } catch (IOException e) {
             logging("Error");
         } finally {
