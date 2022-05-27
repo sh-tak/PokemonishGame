@@ -148,4 +148,9 @@ public class Server {
         }
         return false;
     }
+
+    public void showCurrentHp(ServerThread st1, ServerThread st2) {
+        sendEm("Now " + st1.monster.name + "'s health is " + st1.monster.hp, st1, st2);
+        sendEm("Now " + st2.monster.name + "'s health is " + st2.monster.hp, st1, st2);
+    }
 }
