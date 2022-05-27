@@ -115,7 +115,6 @@ public class Server {
                 if (serverThreads[i].monster.name.equals(st1.monster.name)) {
                     if (serverThreads[i].onTurn) {
                         serverThreads[i].onTurn = false;
-                        st1.onTurn = false;
                     }
                 }
             }
@@ -123,7 +122,6 @@ public class Server {
                 if (serverThreads[i].monster.name.equals(st2.monster.name)) {
                     if (!serverThreads[i].onTurn) {
                         serverThreads[i].onTurn = true;
-                        st2.onTurn = true;
                     }
                 }
             }
@@ -138,11 +136,14 @@ public class Server {
         }
     }
     // ターンの更新 サーバーに保存した情報を取ってくる。
-    public synchronized boolean isTurn(ServerThread st) {
+    public synchronized boolean isTurn(ServerThread st1, ServerThread st2) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (serverThreads[i] != null) {
-                if (serverThreads[i].monster.name == st.monster.name) {
-                    return serverThreads[i].onTurn;
+                if (serverThreads[i].monster.name == st1.monster.name) {
+                    st1.onTurn = serverThreads[i].onTurn;
+                }
+                if(serverThreads[i].monster.name == st2.monster.name){
+                    st2.onTurn =  serverThreads[i].onTurn;
                 }
             }
         }
