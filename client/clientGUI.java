@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ public class clientGUI extends JFrame {
 		// Client client = null; // Client object
 		// String host = "localhost";
 		JTextField hostField, portField;
-		JButton connectBut ,closeBut, quitBut;
+		JButton connectBut ,closeBut, quitBut, okButton;
 		int port = 28000;
 		Thread thread = null;
 		JScrollPane scrollpane = null;
@@ -34,16 +35,26 @@ public class clientGUI extends JFrame {
 		getContentPane().add(freeArea);
 
 		ServerThread st = new ServerThread(null, null, Server.generateMonster(), true);
-
-		String[] listData = {"waza1", "waza2", "waza3", "waza4"};
+		
+		// String[] listData = {"waza1", "waza2", "waza3", "waza4"};
 		wazaList = new JList();
 		wazaList.setListData(st.monster.moveList);
 		getContentPane().add(wazaList);
 		setVisible(true);
-  
-		int selectednumber = wazaList.getSelectedIndex();
+		
+		okButton = new JButton("OK");
+		String test = "test";
+		okButton.addActionListener(
+			new ActionListener(){
+				public void actionPerformed(ActionEvent event){
+					System.out.println(test);
+					int selectednumber = wazaList.getSelectedIndex();
+					freeArea.setText(Integer.toString(selectednumber));
+				}
+			}
+		);
+		getContentPane().add(okButton);
 
-		freeArea.setText(Integer.toString(selectednumber));
 		setVisible(true);
 	}
 
