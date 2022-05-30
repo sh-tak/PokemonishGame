@@ -9,8 +9,13 @@ public class ClientUI extends JFrame{
     
     public static void main(String[] args) {
         // debug
-        new ClientUI();
-        
+        ClientUI client = new ClientUI();
+        client.setStatus("newStatus");
+        String[] testWaza = {"hello", "he", "ll", "o"};
+        client.setWaza(testWaza);
+        client.log("1\n");
+        client.log("2\n");
+        client.setImage("client/image/a.png");
     }
     
     JLabel imageLabel;
@@ -53,6 +58,7 @@ public class ClientUI extends JFrame{
     public void setImage(String file) {
         ImageIcon icon = new ImageIcon(file);
         imageLabel.setIcon(icon);
+        imageLabel.setText("");
     }
 
     public void setButtonAction(Action action) {
