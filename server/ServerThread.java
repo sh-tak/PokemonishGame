@@ -11,7 +11,7 @@ public class ServerThread extends Thread {
     BufferedReader in;
     PrintWriter out;
     Object opponent;
-    Monster monster;
+    public Monster monster;
     boolean onTurn;
 
     // 同時にクライアントに対応するためにServerThreadがクライアントに対応する。

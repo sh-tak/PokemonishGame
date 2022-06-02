@@ -8,12 +8,15 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import server.ServerThread;
+
 /**
  *
  * @author ogawa
  */
 public class JFrameTest extends JFrame {
 
+  ServerThread serverThread;
     /**
      * @param args the command line arguments
      */
@@ -74,7 +77,7 @@ public class JFrameTest extends JFrame {
 
       // コンボボックスの追加
       JComboBox cm1 = new JComboBox();
-      cm1.addItem("Fedora");
+      cm1.addItem(serverThread.monster.moveList[0].toString());
       cm1.addItem("Ubuntu");
       cm1.addItem("Vine");
       cm1.addItem("BSD");
