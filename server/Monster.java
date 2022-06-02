@@ -14,6 +14,7 @@ public class Monster {
     public Move moveList[];// 技; 
     public int sum;// 個体値
     public int hp;// 実HP
+    public Object[] moveLists;
 
     public Monster(Move moveList[], String type) {
         this.name = "";
