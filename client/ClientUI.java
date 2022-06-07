@@ -69,3 +69,6 @@ public class ClientUI extends JFrame{
         logArea.append(log);
     }
 }
+© 2022 GitHub, Inc.
+Terms
+Privacy
