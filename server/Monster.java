@@ -4,31 +4,32 @@ import java.util.Random;
 
 public class Monster {
     public String name;// 名前
-    public int health;// HP
-    public int attack;// 攻撃
-    public int block;// 防御
-    public int contact;// 特攻
-    public int defense;// 特防
-    public int speed;// 素早さ
+    public IndivisualValue health;// hp
+    public IndivisualValue attack;// 攻撃
+    public IndivisualValue block;// 防御
+    public IndivisualValue contact;// 特攻
+    public IndivisualValue defense;// 特防
+    public IndivisualValue speed;// 素早さ
     String type;// 属性
-    public Move moveList[];// 技; 
+    public Move moves[];// 技; 
     public int sum;// 個体値
-    public int hp;// 実HP
-    public Object[] moveLists;
+    public int hp;// 実hp
 
-    public Monster(Move moveList[], String type) {
+    public Monster(Move moves[], String type) {
         this.name = "";
-        this.health = generateBaseStats();
-        this.attack = generateBaseStats();
-        this.block = generateBaseStats();
-        this.contact = generateBaseStats();
-        this.defense = generateBaseStats();
-        this.speed = generateBaseStats();
+        this.health = new IndivisualValue("HP");
+        this.attack = new IndivisualValue("攻撃");
+        this.block = new IndivisualValue("防御");
+        this.contact = new IndivisualValue("特攻");
+        this.defense = new IndivisualValue("特防");
+        this.speed = new IndivisualValue("素早さ");
         this.type = type;
-        this.sum = this.health + this.attack + this.block + this.contact + this.defense + this.speed;
-        this.hp = (this.sum * 2 + this.health) + 110;
-        this.moveList = moveList;
+        this.sum = this.health.getValue() + this.attack.getValue() + this.block.getValue() +
+            this.contact.getValue() + this.defense.getValue() + this.speed.getValue();
+        this.hp = (this.sum * 2 + this.health.getValue()) + 110;
+        this.moves = moves;
     }
+
     public static int type2val(String type){
         int value = 0;
         switch(type){
@@ -50,11 +51,11 @@ public class Monster {
         }
         return value;
     }
-
-    private int generateBaseStats(){
-        return new Random().nextInt(31);
+    public String gettype(){
+        return this.type+this.name;
     }
-    public void decreaseHP(int n) {
-        this.hp -= n;
+
+    public void decreaseHp(int damage) {
+        this.hp -= damage;
     }
 }

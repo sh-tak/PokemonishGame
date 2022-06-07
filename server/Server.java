@@ -8,7 +8,7 @@ public class Server {
     //TODO 最大クライアント数を4に拡張?(その際sendEmやisGameOverなどの関数も変更必要)
     static int MAX_CONNECTIONS = 2;
     static ServerThread serverThreads[] = new ServerThread[MAX_CONNECTIONS]; 
-    // クライアント間で通信するためにサーバーに情報を保存(現段階では、具体的にはターンを表すnoTurnをリアルタイムで更新するために使う。)
+    // クライアント間で同期するためにサーバーに情報を保存(現段階では、具体的にはターンを表すnoTurnをリアルタイムで更新するために使う。)
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
@@ -32,6 +32,7 @@ public class Server {
         }
     }
 
+    //TODO: 技をサーバーにたくさん追加して、モンスターごとにランダムに技を選ぶようにする
     public static Monster generateMonster() {
         Move moveList[] = new Move[4];
         moveList[0] = new Move("fire", 50, 3, 1, true);
@@ -54,8 +55,8 @@ public class Server {
     // クライアントが自分のターンになったた使える技の一覧を表示
     public void showMoveLineup(ServerThread st) {
         sendHim("You have 4 moves", st);
-        for (int i = 0; i < st.monster.moveList.length; i++) {
-            sendHim(st.monster.moveList[i].toString(), st);
+        for (int i = 0; i < st.monster.moves.length; i++) {
+            sendHim(st.monster.moves[i].toString(), st);
         }
         sendHim("---Enter the number of the move you want to use---", st);
     }
@@ -80,9 +81,9 @@ public class Server {
     }
     // 攻撃後にクライアント全員に攻撃結果を表示　moveIdxはクライアントが選択して技の番号
     public void showMoveResult(ServerThread atker, ServerThread opponent, int moveIdx) {
-        int dmg = atker.monster.moveList[moveIdx].useMove(atker.monster, opponent.monster);
-        opponent.monster.decreaseHP(dmg);
-        sendEm(atker.monster.name + " used " + atker.monster.moveList[moveIdx].name + " and did " + dmg + " damage",
+        int damage = atker.monster.moves[moveIdx].useMove(atker.monster, opponent.monster);
+        opponent.monster.decreaseHp(damage);
+        sendEm(atker.monster.name + " used " + atker.monster.moves[moveIdx].name + " and did " + damage + " damage",
                 atker, opponent);
     }
     // ゲーム開始時？にクライアントに自身のモンスター情報を表示
@@ -108,7 +109,6 @@ public class Server {
     }
     // ターンを変える。スレッド間でターンの情報を同期するためにサーバに保存したserverThreads[]に対してターン情報onTurnを更新する。
     // その後、そのターン情報をスレッド自体にも更新。
-    //　FIXME : クライアントが入力したモンスタの名前で検索しているので、それが同じ名前だと正しくターンを更新できない。
     public synchronized void changeTurn(ServerThread st1, ServerThread st2) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (serverThreads[i] != null) {

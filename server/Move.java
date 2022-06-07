@@ -1,6 +1,5 @@
 package server;
 
-import java.io.*;
 import java.util.Random;
 
 // TODO Healの追加
@@ -86,9 +85,9 @@ public class Move {
         }
 
         if(this.isPhysical){
-            k = myMonster.attack / oppMonster.block;
+            k = myMonster.attack.getValue() / oppMonster.block.getValue();
         }else {
-            k = myMonster.contact / oppMonster.defense;
+            k = myMonster.contact.getValue() / oppMonster.defense.getValue();
         }
 
         if(Monster.type2val(myMonster.type) == 4){
