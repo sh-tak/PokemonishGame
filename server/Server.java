@@ -54,11 +54,11 @@ public class Server {
     }
     // クライアントが自分のターンになったた使える技の一覧を表示
     public void showMoveLineup(ServerThread st) {
-        sendHim("You have 4 moves", st);
+        sendHim("技は4種類あります", st);
         for (int i = 0; i < st.monster.moves.length; i++) {
             sendHim(st.monster.moves[i].toString(), st);
         }
-        sendHim("---Enter the number of the move you want to use---", st);
+        sendHim("---使いたい技の番号を---入力してください",  st);
     }
     // ターンの終了ごとにクライアント全員にHP状況を表示
     public void showTheirHp(ServerThread st1, ServerThread st2) {
@@ -89,13 +89,13 @@ public class Server {
     // ゲーム開始時？にクライアントに自身のモンスター情報を表示
     public void showStats(ServerThread st) {
         sendHim("-----------------",st);
-        sendHim("\nYour type is " + st.monster.type, st);
-        sendHim("\nYour hp is " + st.monster.health, st);
-        sendHim("\nYour attack is " + st.monster.attack, st);
-        sendHim("\nYour block is " + st.monster.block, st);
-        sendHim("\nYour contanct is " + st.monster.contact, st);
-        sendHim("\nYour defense is " + st.monster.defense, st);
-        sendHim("\nYour speed is " + st.monster.speed, st);
+        sendHim("\n 属性は " + st.monster.type, st);
+        sendHim("\nYour hpは " + st.monster.health, st);
+        sendHim("\nYour 攻撃は " + st.monster.attack, st);
+        sendHim("\nYour 防御は " + st.monster.block, st);
+        sendHim("\nYour 特攻は" + st.monster.contact, st);
+        sendHim("\nYour 特防は " + st.monster.defense, st);
+        sendHim("\nYour 素早さは is " + st.monster.speed, st);
         if(st.monster.sum < 91){
             sendHim("まずまずな能力", st);
         }else if(st.monster.sum < 151){
@@ -130,9 +130,9 @@ public class Server {
     // ターン情報を表示
     public void showTurn(ServerThread st1, ServerThread st2) {
         if (st1.onTurn) {
-            sendEm("---It's " + st1.monster.name + "'s turn---", st1, st2);
+            sendEm("---今は" + st1.monster.name + "のターンです---", st1, st2);
         } else {
-            sendEm("---It's " + st2.monster.name + "'s turn---", st1, st2);
+            sendEm("---今は " + st2.monster.name + "のターンです---", st1, st2);
         }
     }
     // ターンの更新 サーバーに保存した情報を取ってくる。
@@ -151,7 +151,7 @@ public class Server {
     }
 
     public void showCurrentHp(ServerThread st1, ServerThread st2) {
-        sendEm("Now " + st1.monster.name + "'s health is " + st1.monster.hp, st1, st2);
-        sendEm("Now " + st2.monster.name + "'s health is " + st2.monster.hp, st1, st2);
+        sendEm("現在の" + st1.monster.name + "のHPは " + st1.monster.hp, st1, st2);
+        sendEm("現在の " + st2.monster.name + "のHPは " + st2.monster.hp, st1, st2);
     }
 }

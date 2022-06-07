@@ -32,11 +32,11 @@ public class ServerThread extends Thread {
             out = new PrintWriter(socket.getOutputStream(), true);
             String name = in.readLine();
             this.monster.name = name;
-            logging("New Client connected");
+            logging("新しいクライアントが接続されました");
             String s; // store message from client
-            server.sendHim("\n---You connected to the server---", this);
-            server.sendHim("\nYour opponent is " + this.monster.name, opponent);
-            server.sendHim("\n---Game is starting now---", this);
+            server.sendHim("\n---あなたはサーバーに接続されました---", this);
+            server.sendHim("\nあなたの敵は " + this.monster.name, opponent);
+            server.sendHim("\n--- ゲームが開始します ---", this);
             while (true) {
                 while (true) {
                         server.isTurn(this, opponent);

@@ -14,10 +14,10 @@ public class Client {
             BufferedReader userin = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter userout = new PrintWriter(System.out, true);
             // サーバに接続する前に、モンスターの名前を入力する。
-            logging("---You can input your Monster's name---");
+            logging("--- モンスターの名前を入力してください ---");
             String name = userin.readLine();
             Socket socket = new Socket(InetAddress.getLocalHost(), 8000);
-            logging("\n---Waiting for opponent---");
+            logging("\n--- 対戦相手を待っています---");
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             Linkup usr2srv = new Linkup(userin, out);
@@ -27,7 +27,7 @@ public class Client {
             usr2srv.start();
             srv2usr.start();
         } catch (IOException e) {
-            System.out.println("Error");
+            System.out.println("クライアントエラー");
         }
     }
     public static void logging(String s){
