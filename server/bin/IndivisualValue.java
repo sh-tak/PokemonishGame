@@ -1,14 +1,14 @@
-package server;
+package server.bin;
 
 import java.util.Random;
 
 public class IndivisualValue {
     private static int MAX_VALUE = 32;
     private int value;
-    private String name;
+    private String idName;
 
-    public IndivisualValue(String name){
-        this.name = name;
+    public IndivisualValue(String idName){
+        this.idName = idName;
         this.value = new Random().nextInt(MAX_VALUE);
     }
 
@@ -18,19 +18,19 @@ public class IndivisualValue {
     
     public String showStats(){
         if(this.value < 1){
-            return "not good";
+            return "ダメかも";
         }
         else if(this.value < 16){
-            return "not bad";
+            return "よくない";
         }
         else if(this.value < 26){
-            return "good";
+            return "悪くない";
         }
         else if(this.value < 31){
-            return "very good";
+            return "良い";
         }
         else{
-            return "excellent";
+            return "素晴らしい";
         }
     }
 }

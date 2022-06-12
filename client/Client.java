@@ -13,21 +13,15 @@ public class Client {
         try {
             BufferedReader userin = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter userout = new PrintWriter(System.out, true);
-            // サーバに接続する前に、モンスターの名前を入力する。
-            logging("--- モンスターの名前を入力してください ---");
-            String name = userin.readLine();
             Socket socket = new Socket(InetAddress.getLocalHost(), 8000);
-            logging("\n--- 対戦相手を待っています---");
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             Linkup usr2srv = new Linkup(userin, out);
             Linkup srv2usr = new Linkup(in, userout);
-            out.println(name);
-            // Start the threads
             usr2srv.start();
             srv2usr.start();
         } catch (IOException e) {
-            System.out.println("クライアントエラー");
+            System.out.println("サーバーが起動していないか、接続できませんでした。");
         }
     }
     public static void logging(String s){
