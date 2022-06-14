@@ -48,11 +48,11 @@ public class Move {
     }
 
     public double calculateMultiplier(Monster myMonster, Monster oppMonster) {
-        double same = 1; // タイプ一致
-        double con = 1; // タイプ相性
-        double k = 1; // 物理特殊倍率
-        double me = 1; // 自分の光闇
-        double you = 1; // 相手の光闇
+        double same = 1.; // タイプ一致
+        double con = 1.; // タイプ相性
+        double k = 1.; // 物理特殊倍率
+        double me = 1.; // 自分の光闇
+        double you = 1.; // 相手の光闇
 
         if (Monster.type2val(myMonster.type) == this.typeValue) {
             same = 1.5;
@@ -79,16 +79,16 @@ public class Move {
                     con = 0.5;
                 }
                 if (this.typeValue == 2) {
-                    con = 2;
+                    con = 2.0;
                 }
                 break;
         }
 
         if (this.isPhysical) {
             //division by zero　を防ぐ
-            k = myMonster.attack.getValue() / (oppMonster.block.getValue() + 1);
+            k = myMonster.attack.getValue() / (oppMonster.block.getValue() + 1.);
         } else {
-            k = myMonster.contact.getValue() / (oppMonster.defense.getValue() + 1);
+            k = myMonster.contact.getValue() / (oppMonster.defense.getValue() + 1.);
         }
 
         if (Monster.type2val(myMonster.type) == 4) {

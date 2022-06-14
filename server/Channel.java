@@ -20,9 +20,6 @@ public class Channel extends Thread {
     public Monster monster;
     public boolean onTurn;
 
-    private int state;
-    private static final int WAIT_FOR_NAME_INPUT = 0;
-
     Channel(Socket socket, Server server, int id) {
         this.server = server;
         this.socket = socket;
@@ -126,6 +123,8 @@ public class Channel extends Thread {
 
     public void close() {
         try {
+            logging("対戦が終了しました");
+            logging("クライアント" + id + "を切断します");
             in.close();
             out.close();
             socket.close();

@@ -144,6 +144,7 @@ public class Server extends Thread {
             String compatibility;
             double multiplier = myMove.calculateMultiplier(channels[myId].monster,
                     channels[opponentId].monster);
+            logging("倍率" + multiplier);
             if(multiplier < 1.0) {
                 compatibility = "効果はいまいちだ\n";
             }else if(multiplier < 1.5) {

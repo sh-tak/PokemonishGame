@@ -25,7 +25,7 @@ public class ConsoleClient extends Thread {
             client.initTurn(client.recieve()); //先攻か後攻かを受け取ってターンを初期化
             client.inBattle();
             client.showBattleResult();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
