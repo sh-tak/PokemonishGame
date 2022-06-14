@@ -2,9 +2,13 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Client {
     private static final int PORT = 8080;
@@ -12,6 +16,7 @@ public class Client {
     BufferedReader in = null;
     PrintWriter out = null;
     BufferedReader stdIn = null;
+    // Scanner stdIn = null;
 
     private static final int NAME_INPUTTING = 0;
     private static final int WAIT_FOR_NAME_ACK = 1;
@@ -30,6 +35,7 @@ public class Client {
             out = new PrintWriter(socket.getOutputStream(), true);
             stdIn = new BufferedReader(
                     new InputStreamReader(System.in));
+            // stdIn = new Scanner(System.in);
             state = NAME_INPUTTING;
         } catch (IOException e) {
             logging("接続失敗");
@@ -44,6 +50,7 @@ public class Client {
 
     public String read() throws IOException {
         return stdIn.readLine();
+        //return stdIn.nextLine();
     }
 
     public String recieve() throws IOException {
@@ -60,7 +67,7 @@ public class Client {
         out.println(s);
     }
 
-     private void nameInputAndSend() throws IOException {
+    private void nameInputAndSend() throws IOException {
         String name =  read();
         while (name == null || name.equals("")) {
             logging("名前は一文字以上で入力してください");
@@ -83,7 +90,7 @@ public class Client {
         }
     }
 
-    public void nameInputAndAck() throws IOException {
+    public void nameInputAndAck() throws IOException, InterruptedException {
         while (state == NAME_INPUTTING) {
             send(Integer.toString(state));// 先に状態を送る 
             nameInputAndSend();
@@ -92,13 +99,17 @@ public class Client {
     }
 
     public boolean isValidInput(String str) {
-        if(str.equals("0") || str.equals("1") || str.equals("2") || str.equals("3")) {
+        if(str.equals("0") || 
+            str.equals("1") || 
+            str.equals("2") || 
+            str.equals("3")) {
             return true;
         }
         return false;
     }
 
-    public void moveIndexInputAndSend() throws IOException{
+    public void moveIndexInputAndSend() throws IOException, InterruptedException{
+        //TODO: 相手のターン中に入力された文字列を消す
         String moveIndex = read();
         while (!isValidInput(moveIndex)) {
             logging("0~3の数字を入力してください");
@@ -117,7 +128,7 @@ public class Client {
         }
     }
 
-    public void inBattle() throws IOException {
+    public void inBattle() throws IOException, InterruptedException {
         while(state != WIN && state != LOSE) {
             if(state == MY_TURN){
                 logging("あなたのターンです");
