@@ -109,8 +109,16 @@ public class Client {
     }
 
     public void moveIndexInputAndSend() throws IOException, InterruptedException{
-        //TODO: 相手のターン中に入力された文字列を消す
-        String moveIndex = read();
+        String moveIndex;
+        // 相手のターン中に入力されたら捨てる
+        while(true){
+            long start = System.currentTimeMillis();
+            moveIndex = read();
+            long end = System.currentTimeMillis();
+            if(end - start > 10){// 入力が呼び出しから10ms以下に行われたら予め入力されているとみなす。
+                break;
+            }
+        }
         while (!isValidInput(moveIndex)) {
             logging("0~3の数字を入力してください");
             moveIndex = read();
