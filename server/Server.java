@@ -103,7 +103,6 @@ public class Server extends Thread {
         }
         return -1;
     }
-
     
     public void showMoveLineup(int id) {
         String str  = "技は4種類あります\n";
@@ -182,19 +181,6 @@ public class Server extends Thread {
         }
     }
 
-    // ターンを変える。スレッド間でターンの情報を同期するためにサーバに保存したchannels[]に対してターン情報onTurnを更新する。
-    public synchronized void changeTurn(int myId, int opponentId) {
-        if (channels[myId].onTurn) {
-            channels[myId].onTurn = false;
-            channels[opponentId].onTurn = true;
-            return;
-        } else if(channels[opponentId].onTurn) {
-            channels[myId].onTurn = true;
-            channels[opponentId].onTurn = false;
-            return;
-        }
-    }
-
     public void showCurrentHp(int myId, int opponentId) {
         sendAll("現在の" + channels[myId].monster.name + "のHPは " + 
             (channels[myId].monster.hp > 0 ? channels[myId].monster.hp : "0") + "です");
@@ -205,7 +191,6 @@ public class Server extends Thread {
     // csvファイルmoves.csvから技リストを読み込む
     // Channelごとに技リストを取得している。
     // -> サーバー側で技リスト取得、保存し、それをChannelに配布したほうがいいかも
-    // OSによってパスの指定方法が異なるなら、パスをコマンドライン引数で指定できるように変更したほうがいいかも
     public Move[] fetchMovesFromCsv(String filename) {
         int i = 0;
         try {

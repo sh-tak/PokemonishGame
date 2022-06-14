@@ -18,7 +18,6 @@ public class Channel extends Thread {
     public String opponentName = "";
     public int opponentId = -1;
     public Monster monster;
-    public boolean onTurn;
 
     Channel(Socket socket, Server server, int id) {
         this.server = server;
