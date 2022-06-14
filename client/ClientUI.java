@@ -24,31 +24,37 @@ public class ClientUI extends JFrame{
             }
         });
         client.clearLog();
+
+        client.setEnemyImage("client/image/a.png");
     }
     
-    JLabel imageLabel;
-    JLabel statusLabel;
+    JLabel imageLabel, enemyImage;
+    JLabel statusLabel, enemyStatus;
     JList<String> wazaList;
     JButton okButton;
     JTextArea logArea;
-    JProgressBar hpBar;
+    JProgressBar hpBar, enemyHp;
 
     ClientUI() {
         setTitle("Pokemonish Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300, 400);
+        setSize(350, 600);
         getContentPane().setLayout(new FlowLayout());
         
         imageLabel = new JLabel("no image");
-        imageLabel.setBounds(5, 5, 100, 100);
+        // imageLabel.setBounds(5, 5, 100, 100);
         statusLabel = new JLabel("wait for status");
         hpBar = new JProgressBar(1, 100);
-        hpBar.setBounds(0, 0, 100, 5);
+        // hpBar.setBounds(0, 0, 100, 5);
         hpBar.setValue(100);
         String[] initialList = {"a", "b", "c", "d"};
         wazaList = new JList<>(initialList);
         okButton = new JButton("OK");
         logArea = new JTextArea("log start...\n", 5, 20);
+
+        enemyImage = new JLabel("no image enemy");
+        enemyStatus = new JLabel("wait for status enemy");
+        enemyHp = new JProgressBar(1, 100);
 
         //TODO: set size of each component
         
@@ -58,6 +64,11 @@ public class ClientUI extends JFrame{
         getContentPane().add(wazaList);
         getContentPane().add(okButton);
         getContentPane().add(logArea);
+
+        getContentPane().add(enemyImage);
+        getContentPane().add(enemyStatus);
+        getContentPane().add(enemyHp);
+
         setVisible(true);
     }    
 
@@ -94,5 +105,19 @@ public class ClientUI extends JFrame{
 
     public int getSelectedWaza(){
         return wazaList.getSelectedIndex();
+    }
+
+    public void setEnemyHp(int hp){
+        enemyHp.setValue(hp);
+    }
+
+    public void setEnemyImage(String file) {
+        ImageIcon icon = new ImageIcon(file);
+        enemyImage.setIcon(icon);
+        enemyImage.setText("");
+    }
+
+    public void setEnemyStatus(String status) {
+        enemyStatus.setText(status);
     }
 }
