@@ -19,6 +19,11 @@ public class Channel extends Thread {
     public int opponentId = -1;
     public Monster monster;
 
+    // クライアントの状態。ターンの判定などに使う
+    private final String NAME_INPUTTING = "0";
+    private final String MY_TURN = "3";
+    private final String OPPONENT_TURN = "4";
+
     Channel(Socket socket, Server server, int id) {
         this.server = server;
         this.socket = socket;
@@ -79,7 +84,7 @@ public class Channel extends Thread {
     public void nameAck() throws IOException {
         while (true) { // クライアントの状態が変わるまで
             String clientState = receive();
-            if (!clientState.equals("0")) {
+            if (!clientState.equals(NAME_INPUTTING)) {
                 break;
             }
             String name = receive();
@@ -96,7 +101,7 @@ public class Channel extends Thread {
     public void inBattle() throws IOException {
         while (true) { // クライアントの状態が変わるまで
             String clientState = receive();
-            if (clientState.equals("3")) {// 攻撃側
+            if (clientState.equals(MY_TURN)) {// 攻撃側
                 server.showMoveLineup(id);
                 int moveIdx = Integer.parseInt(receive());// 技番号の受け取り
                 server.useMove(id, opponentId, moveIdx);// 技の結果を表示
@@ -107,7 +112,7 @@ public class Channel extends Thread {
                 }else {
                     send("0");
                 }
-            } else if (clientState.equals("4")) {// 防御側
+            } else if (clientState.equals(OPPONENT_TURN)) {// 防御側
                 // 攻撃側の呼び出しで技の結果, HPを表示
                 receive(); // 技の結果の受け取り確認
                 if (server.isGameover(id, opponentId)) {

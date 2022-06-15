@@ -2,13 +2,9 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class Client {
     private static final int PORT = 8080;
@@ -16,7 +12,6 @@ public class Client {
     BufferedReader in = null;
     PrintWriter out = null;
     BufferedReader stdIn = null;
-    // Scanner stdIn = null;
 
     private static final int NAME_INPUTTING = 0;
     private static final int WAIT_FOR_NAME_ACK = 1;
@@ -35,7 +30,6 @@ public class Client {
             out = new PrintWriter(socket.getOutputStream(), true);
             stdIn = new BufferedReader(
                     new InputStreamReader(System.in));
-            // stdIn = new Scanner(System.in);
             state = NAME_INPUTTING;
         } catch (IOException e) {
             logging("接続失敗");
@@ -50,7 +44,6 @@ public class Client {
 
     public String read() throws IOException {
         return stdIn.readLine();
-        //return stdIn.nextLine();
     }
 
     public String recieve() throws IOException {
@@ -98,6 +91,7 @@ public class Client {
         }
     }
 
+    // 技の番号の入力の判定に使う
     public boolean isValidInput(String str) {
         if(str.equals("0") || 
             str.equals("1") || 
@@ -115,7 +109,8 @@ public class Client {
             long start = System.currentTimeMillis();
             moveIndex = read();
             long end = System.currentTimeMillis();
-            if(end - start > 10){// 入力が呼び出しから10ms以下に行われたら予め入力されているとみなす。
+            // 20msは経験的な値(5msとかでもいいかも)
+            if(end - start > 20){// 入力が呼び出しから20ms以下に行われたら予め入力されているとみなす。
                 break;
             }
         }
@@ -136,6 +131,7 @@ public class Client {
         }
     }
 
+    // バトル中のループを行う関数 バトルが終わったらこの関数のループから抜ける
     public void inBattle() throws IOException, InterruptedException {
         while(state != WIN && state != LOSE) {
             if(state == MY_TURN){

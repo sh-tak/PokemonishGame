@@ -104,4 +104,8 @@ public class Move {
         }
         return same * con * k * me * you;
     }
+
+    public int getStruggleGamage() {
+        return new Random().nextInt(STRUGGLE_DAMAGE);
+    }
 }
