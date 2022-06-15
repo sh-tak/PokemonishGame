@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import server.bin.Monster;
 import server.bin.Move;
@@ -72,7 +71,8 @@ public class Server extends Thread {
             }
         }
     }
-
+    
+    // 名前重複確認
     public boolean isDuplicate(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (channels[i] != null && channels[i].name.equals(name)) {
@@ -82,6 +82,7 @@ public class Server extends Thread {
         return false;
     }
 
+    // サーバーに名前を登録
     public void setName(String name, int id) {
         channels[id].name = name;
     }
@@ -129,15 +130,16 @@ public class Server extends Thread {
         Move myMove = channels[myId].monster.moves[moveIdx];
         String partition = "--------------";
 
+        // 選んだ技の使用可能回数が0なら悪あがきを繰り出す
         if (channels[myId].monster.moves[moveIdx].count <= 0) {
-            int STRUGGLE_DAMAGE = new Random().nextInt(51);
-            channels[opponentId].monster.hp -= STRUGGLE_DAMAGE;
+            int damage = channels[myId].monster.moves[moveIdx].getStruggleGamage();
+            channels[opponentId].monster.hp -= damage;
             sendAll(partition + "\n" +
                     myName + "は" +
                     myMove.name + "を使用できません\n" +
                     "代わりに悪あがきを繰り出した!\n" +
                     opponentName + "に" +
-                    STRUGGLE_DAMAGE + "のダメージを与えた!\n" + partition);
+                    damage + "のダメージを与えた!\n" + partition);
             return;
         } else {
             String compatibility;
@@ -168,7 +170,6 @@ public class Server extends Thread {
         sendOne(channels[id].monster.toString(), channels[id]);
     }
 
-
     public int isFirstTurn(int id) {
         int mySpeed = channels[id].monster.speed.getValue();
         int opponentSpeed = channels[id==1?0:1].monster.speed.getValue();
@@ -190,7 +191,7 @@ public class Server extends Thread {
 
     // csvファイルmoves.csvから技リストを読み込む
     // Channelごとに技リストを取得している。
-    // -> サーバー側で技リスト取得、保存し、それをChannelに配布したほうがいいかも
+    // -> サーバー起動時で技リスト取得、保存し、それをChannelに配布したほうがいいかも
     public Move[] fetchMovesFromCsv(String filename) {
         int i = 0;
         try {
@@ -241,10 +242,6 @@ public class Server extends Thread {
 
     public Monster getMonster(Move[] moves, String name) {
         return new Monster(moves, name);
-    }
-
-    public synchronized void initializeTurn(int id, boolean onTurn) {
-        channels[id].onTurn = onTurn;
     }
 
     public void logging(String str) {
