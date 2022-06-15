@@ -20,7 +20,6 @@ public class ConsoleClient extends Thread {
             client.recieveAndLog(10); // 生成したモンスターのデータを受け取る
             client.logging("対戦相手を探しています");
             client.recieveAndLog(2); // 対戦相手を表示
-            // 対戦開始
             client.logging("対戦開始");
             client.initTurn(client.recieve()); //先攻か後攻かを受け取ってターンを初期化
             client.inBattle();
