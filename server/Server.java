@@ -89,7 +89,7 @@ public class Server extends Thread {
 
     public String findOpponent(int id) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (channels[i] != null && i != id) {
+            if (channels[i] != null && channels[i].monster != null && i != id) {
                 return channels[i].name;
             }
         }
@@ -240,10 +240,6 @@ public class Server extends Thread {
             returnMove[i] = moves[list.get(i)];
         }
         return returnMove;
-    }
-
-    public Monster getMonster(Move[] moves, String name) {
-        return new Monster(moves, name);
     }
 
     public void logging(String str) {

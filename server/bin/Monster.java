@@ -15,7 +15,7 @@ public class Monster {
     public int sum;// 個体値
     public int hp;// 実hp
 
-    public Monster(Move moves[], String name) {
+    public Monster(Move moves[], String name, String type) {
         this.name = name;
         this.health = new IndivisualValue("HP");
         this.attack = new IndivisualValue("攻撃");
@@ -23,8 +23,7 @@ public class Monster {
         this.contact = new IndivisualValue("特攻");
         this.defense = new IndivisualValue("特防");
         this.speed = new IndivisualValue("素早さ");
-        String[] tmp = {"火", "水", "草", "光", "闇"};
-        this.type = tmp[new Random().nextInt(5)]; 
+        this.type = type;
         this.sum = this.health.getValue() + this.attack.getValue() + this.block.getValue() +
             this.contact.getValue() + this.defense.getValue() + this.speed.getValue();
         this.hp = (this.sum * 2 + this.health.getValue()) + 110;
@@ -51,6 +50,28 @@ public class Monster {
                 break;
         }
         return value;
+    }
+
+    public static String val2type(int value){
+        String type = "";
+        switch(value){
+            case 1:
+                type = "火";
+                break;
+            case 2:
+                type = "水";
+                break;
+            case 3:
+                type = "草";
+                break;
+            case 4:
+                type = "光";
+                break;
+            case 5:
+                type = "闇";
+                break;
+        }
+        return type;
     }
 
     public String getType(){

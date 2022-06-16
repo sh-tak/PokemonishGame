@@ -9,7 +9,8 @@ public class ConsoleClient {
             client = new Client();
             client.connect();
             client.recieveAndLog(3); // 接続確認応答を受け取る
-            client.nameInputAndAck();
+            client.nameInputAndAck(); //モンスターの名前を入力
+            client.MonsterTypeInputAndSend(); // モンスターの属性を入力 
             client.logging("あなたのモンスターを生成します");
             client.recieveAndLog(10); // 生成したモンスターのデータを受け取る
             client.logging("対戦相手を探しています");

@@ -91,12 +91,36 @@ public class Client {
         }
     }
 
+    public void MonsterTypeInputAndSend() throws IOException {
+        logging("モンスターの属性を選択してください");
+        logging("1: 火 2: 水 3: 草 4: 光 5: 闇");
+        String val = read();
+        while (!isValidTypeInput(val)) {
+            logging("1から5の数字で入力して下さい");
+            logging("1: 火 2: 水 3: 草 4: 光 5: 闇");
+            val = read();
+        }
+        send(val);
+    }
+
     // 技の番号の入力の判定に使う
-    public boolean isValidInput(String str) {
+    private boolean isValidMoveInput(String str) {
         if(str.equals("0") || 
             str.equals("1") || 
             str.equals("2") || 
             str.equals("3")) {
+            return true;
+        }
+        return false;
+    }
+    
+    // 属性の入力に用いる   
+    private boolean isValidTypeInput(String str) {
+        if(str.equals("1") || 
+            str.equals("2") || 
+            str.equals("3") || 
+            str.equals("4") || 
+            str.equals("5")) {
             return true;
         }
         return false;
@@ -114,7 +138,7 @@ public class Client {
                 break;
             }
         }
-        while (!isValidInput(moveIndex)) {
+        while (!isValidMoveInput(moveIndex)) {
             logging("0~3の数字を入力してください");
             moveIndex = read();
         }
