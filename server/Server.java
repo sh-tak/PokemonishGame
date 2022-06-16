@@ -134,12 +134,14 @@ public class Server extends Thread {
         if (channels[myId].monster.moves[moveIdx].count <= 0) {
             int damage = channels[myId].monster.moves[moveIdx].getStruggleGamage();
             channels[opponentId].monster.hp -= damage;
+            channels[myId].monster.hp -= damage/2;
             sendAll(partition + "\n" +
                     myName + "は" +
                     myMove.name + "を使用できません\n" +
                     "代わりに悪あがきを繰り出した!\n" +
                     opponentName + "に" +
-                    damage + "のダメージを与えた!\n" + partition);
+                    damage + "のダメージを与えたが自分も" + damage/2 + "のダメージを受けた\n" +
+                    partition);
             return;
         } else {
             String compatibility;
