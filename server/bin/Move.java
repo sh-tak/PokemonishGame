@@ -90,6 +90,9 @@ public class Move {
         } else {
             k = (double) myMonster.contact.getValue() / oppMonster.defense.getValue();
         }
+        if (k > 2.){ //kは最大32で大きすぎると一発で試合が終わるので最大を2にする
+            k = 2.; 
+        }
 
         if (Monster.type2val(myMonster.type) == 4) {
             me = 0.5;
