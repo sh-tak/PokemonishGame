@@ -5,11 +5,23 @@ import java.util.Random;
 public class IndivisualValue {
     private static int MAX_VALUE = 32;
     private int value;
-    private String idName;
+    private String name;
 
-    public IndivisualValue(String idName){
-        this.idName = idName;
-        this.value = new Random().nextInt(MAX_VALUE);
+    public IndivisualValue(String name){
+        this.name = name;
+        this.value = generateValue();
+    }
+
+    // 正規分布で値を生成
+    private int generateValue(){
+        // 平均16, 標準偏差8の値を生成(このとき値が1以下もしくは32以上になる確率は約5%)
+        int gaussianValue = (int) (new Random().nextGaussian()*8 +  16);
+        if (gaussianValue > MAX_VALUE) {
+            gaussianValue = MAX_VALUE;
+        }else if(gaussianValue < 1){
+            gaussianValue = 1;
+        }
+        return gaussianValue;    
     }
 
     public int getValue(){

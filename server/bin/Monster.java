@@ -52,6 +52,7 @@ public class Monster {
         }
         return value;
     }
+
     public String getType(){
         return this.type;
     }
@@ -60,17 +61,17 @@ public class Monster {
     public String toString() {
         String partition = "---------------";
         String evaluation;
-        if (sum < 91) {
-            evaluation = "まずまずな個体";
-        } else if (sum < 151) {
-            evaluation = "平均以上な個体";
-        } else if (sum < 151) {
-            evaluation = "相当優秀な個体";
-        } else {
+        if(sum > 136){ //上位1％ 
             evaluation = "素晴らしい個体!";
+        } else if(sum > 110){ //上位20％
+           evaluation = "相当優秀な個体です。";
+        } else if(sum > 93){ //上位50％
+           evaluation = "平均以上な個体です。";    
+        } else{ // 下位50％
+            evaluation = "まずまずな個体です。";
         }
 
-        // Rem: 10行 
+       // Rem: 10行 
         return (partition + "\n" +
                 "属性は " + getType() + "\n" + 
                 "hp値は " + health.getValue() + "\n" +
