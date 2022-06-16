@@ -13,6 +13,7 @@ public class IndivisualValue {
     }
 
     // 正規分布で値を生成
+    // 一様分布で生成すると極端な値を取りやすくなって試合が一瞬で終わったり、全然終わらなかったりしやすいので正規分布で生成
     private int generateValue(){
         // 平均16, 標準偏差8の値を生成(このとき値が1以下もしくは32以上になる確率は約5%)
         int gaussianValue = (int) (new Random().nextGaussian()*8 +  16);

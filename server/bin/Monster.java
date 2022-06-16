@@ -1,7 +1,5 @@
 package server.bin;
 
-import java.util.Random;
-
 public class Monster {
     public String name;// 名前
     public IndivisualValue health;// hp
