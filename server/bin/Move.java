@@ -39,20 +39,21 @@ public class Move {
                 s1 = "闇";
                 break;
         }
-        if (this.isPhysical)
+        if (this.isPhysical){
             s2 = "物理";
-        if (!this.isPhysical)
+        } else{
             s2 = "特殊";
+        }
         return ("技名: " + this.name + " 威力: " + this.damage + 
                 " 最大使用可能回数: " + this.count + " 属性: " + s1 + " 技種類: " + s2 +"\n");
     }
 
     public double calculateMultiplier(Monster myMonster, Monster oppMonster) {
-        double same = 1.; // タイプ一致
-        double con = 1.; // タイプ相性
-        double k = 1.; // 物理特殊倍率
-        double me = 1.; // 自分の光闇
-        double you = 1.; // 相手の光闇
+        double same = 1.0; // タイプ一致
+        double con = 1.0; // タイプ相性
+        double k = 1.0; // 物理特殊倍率
+        double me = 1.0; // 自分の光闇
+        double you = 1.0; // 相手の光闇
 
         if (Monster.type2val(myMonster.type) == this.typeValue) {
             same = 1.5;
@@ -85,10 +86,9 @@ public class Move {
         }
 
         if (this.isPhysical) {
-            //division by zero　を防ぐ
-            k = myMonster.attack.getValue() / (oppMonster.block.getValue() + 1.);
+            k = (double)myMonster.attack.getValue() / oppMonster.block.getValue();
         } else {
-            k = myMonster.contact.getValue() / (oppMonster.defense.getValue() + 1.);
+            k = (double) myMonster.contact.getValue() / oppMonster.defense.getValue();
         }
 
         if (Monster.type2val(myMonster.type) == 4) {
