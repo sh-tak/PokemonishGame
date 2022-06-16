@@ -127,16 +127,10 @@ public class Client {
     }
 
     public void moveIndexInputAndSend() throws IOException, InterruptedException{
-        String moveIndex;
-        // 相手のターン中に入力されたら捨てる
-        while(true){
-            long start = System.currentTimeMillis();
-            moveIndex = read();
-            long end = System.currentTimeMillis();
-            if(end - start > 100){// 入力が呼び出しから100ms以下に行われたら予め入力されているとみなす。
-                break;
-            }
+        while(stdIn.ready()){ // 相手のターン中の入力を捨てる。StackOverFlow
+                read();
         }
+        String moveIndex = read();
         while (!isValidMoveInput(moveIndex)) {
             logging("0~3の数字を入力してください");
             moveIndex = read();
