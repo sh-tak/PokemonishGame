@@ -133,8 +133,7 @@ public class Client {
             long start = System.currentTimeMillis();
             moveIndex = read();
             long end = System.currentTimeMillis();
-            // 20msは経験的な値(5msとかでもいいかも)
-            if(end - start > 20){// 入力が呼び出しから20ms以下に行われたら予め入力されているとみなす。
+            if(end - start > 100){// 入力が呼び出しから100ms以下に行われたら予め入力されているとみなす。
                 break;
             }
         }
