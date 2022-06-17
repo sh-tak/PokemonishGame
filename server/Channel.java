@@ -47,8 +47,7 @@ public class Channel extends Thread {
             nameAck();
             // 属性をクライアントが指定したモンスターをランダムに生成
             String monsterType = Monster.val2type(Integer.parseInt(receive()));
-            Move[] myMoves = server.chooseFourMoves(
-                    server.fetchMovesFromCsv("./server/bin/moves.csv"));
+            Move[] myMoves = server.chooseFourMoves(server.moves);
             monster = new Monster(myMoves, name,monsterType); 
             server.showStats(id);
             // 対戦相手を見つける

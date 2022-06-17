@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import server.bin.Monster;
 import server.bin.Move;
 
 
@@ -17,6 +16,7 @@ public class Server extends Thread {
     private static final int PORT = 8080;
     ServerSocket serverSocket;
     Channel channels[] = new Channel[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
+    Move[] moves;
 
     public static void main(String[] args) throws IOException {
         new Server();
@@ -30,6 +30,7 @@ public class Server extends Thread {
         try {
             serverSocket = new ServerSocket(PORT);
             System.out.println("サーバーが起動しました\n");
+            moves = fetchMovesFromCsv("./server/bin/moves.csv");
             int i;
             while(true){
                 for(i = 0; i < MAX_CONNECTIONS; i++){
@@ -192,8 +193,6 @@ public class Server extends Thread {
     }
 
     // csvファイルmoves.csvから技リストを読み込む
-    // Channelごとに技リストを取得している。
-    // -> サーバー起動時で技リスト取得、保存し、それをChannelに配布したほうがいいかも
     public Move[] fetchMovesFromCsv(String filename) {
         int i = 0;
         try {
@@ -209,11 +208,11 @@ public class Server extends Thread {
                                 Integer.parseInt(moveInfo[2]),
                                 Integer.parseInt(moveInfo[3]),
                                 moveInfo[4].equals("1") ? true : false));
-                        logging(moves.get(i).name + "を読み込みました");
                         i++;
                     }
                 }
             }
+            logging(i + "個の技を読み込みました");
             return moves.toArray(new Move[moves.size()]);
         } catch (IOException e) {
             System.out.println("for debug" +
@@ -231,7 +230,6 @@ public class Server extends Thread {
         for (int i = 0; i < moves.length; i++) {
             list.add(i);
         }
-        logging(moves.length + "個数の技をmoves.csvから追加しました");
         for (int i = 0; i < 30; i++) {
             Collections.shuffle(list);
         }
