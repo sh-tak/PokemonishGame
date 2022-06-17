@@ -9,9 +9,9 @@ import java.net.Socket;
 public class Client {
     private static final int PORT = 8080;
     Socket socket = null;
-    BufferedReader in = null;
-    PrintWriter out = null;
-    BufferedReader stdIn = null;
+    BufferedReader in = null; //サーバからの受信
+    PrintWriter out = null; // サーバーに送信
+    BufferedReader userIn = null; // ユーザーからの入力 コンソールなら標準入力
 
     private static final int NAME_INPUTTING = 0;
     private static final int WAIT_FOR_NAME_ACK = 1;
@@ -22,14 +22,13 @@ public class Client {
     private static final int LOSE = 6;
     private int state = NAME_INPUTTING;
 
-    public void connect() {
+    public void connect(BufferedReader userIn) throws IOException {
         try {
             socket = new Socket("localhost", PORT);
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            stdIn = new BufferedReader(
-                    new InputStreamReader(System.in));
+            this.userIn = userIn;
             state = NAME_INPUTTING;
         } catch (IOException e) {
             logging("接続失敗");
@@ -43,7 +42,7 @@ public class Client {
     }
 
     public String read() throws IOException {
-        return stdIn.readLine();
+        return userIn.readLine();
     }
 
     public String recieve() throws IOException {
@@ -127,7 +126,7 @@ public class Client {
     }
 
     public void moveIndexInputAndSend() throws IOException, InterruptedException{
-        while(stdIn.ready()){ // 相手のターン中の入力を捨てる。StackOverFlow
+        while(userIn.ready()){ // 相手のターン中の入力を捨てる。StackOverFlow
                 read();
         }
         String moveIndex = read();

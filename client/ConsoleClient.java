@@ -1,13 +1,17 @@
 package client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class ConsoleClient {
     public static void main(String[] args) {
         try {
             Client client = new Client();
             client = new Client();
-            client.connect();
+            // コンソールなので標準入力そ引数として渡す。(GUIなら別)
+            // GuiClientではテキストフィールドを引数として渡せば良さそう?
+            client.connect(new BufferedReader(new InputStreamReader(System.in)));
             client.recieveAndLog(3); // 接続確認応答を受け取る
             client.nameInputAndAck(); //モンスターの名前を入力
             client.MonsterTypeInputAndSend(); // モンスターの属性を入力 
