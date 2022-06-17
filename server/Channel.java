@@ -57,8 +57,10 @@ public class Channel extends Thread {
             opponentId = server.getIdByName(opponentName);
             send("対戦相手が見つかりました\n" +
                     "対戦相手は" + opponentName + "です");
-
             // 対戦相手に対戦を開始する
+            while(!server.canStartBattle(id));
+            logging(id);
+            send("対戦を開始します");
             send(Integer.toString(server.isFirstTurn(id)));
             inBattle();
             close();
@@ -96,7 +98,7 @@ public class Channel extends Thread {
             }
         }
     }
-
+    
     public void inBattle() throws IOException {
         while (true) { // クライアントの状態が変わるまで
             String clientState = receive();
@@ -131,7 +133,6 @@ public class Channel extends Thread {
             in.close();
             out.close();
             socket.close();
-            server.channels[id] = null;
         } catch (IOException e) {
             logging(e);
         }
