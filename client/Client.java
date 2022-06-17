@@ -22,20 +22,18 @@ public class Client {
     private static final int LOSE = 6;
     private int state = NAME_INPUTTING;
 
-    public void connect(BufferedReader userIn) throws IOException {
+    public void connect() throws IOException {
         try {
             socket = new Socket("localhost", PORT);
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            this.userIn = userIn;
+            userIn = new BufferedReader(new InputStreamReader(System.in));
             state = NAME_INPUTTING;
         } catch (IOException e) {
             logging("接続失敗");
         }
     }
-
-   
 
     public void logging(Object s) {
         System.out.println(s);
