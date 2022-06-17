@@ -181,7 +181,6 @@ public class Server extends Thread {
         if( channels[oppId].monster != null){
             return true;
         }
-        logging("###");
         return false;
     }
 

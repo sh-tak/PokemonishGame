@@ -59,7 +59,6 @@ public class Channel extends Thread {
                     "対戦相手は" + opponentName + "です");
             // 対戦相手に対戦を開始する
             while(!server.canStartBattle(id));
-            logging(id);
             send("対戦を開始します");
             send(Integer.toString(server.isFirstTurn(id)));
             inBattle();
