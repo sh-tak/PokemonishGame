@@ -34,9 +34,7 @@ public class Client {
             logging("接続失敗");
         }
     }
-
    
-
     public void logging(Object s) {
         System.out.println(s);
     }
@@ -45,13 +43,13 @@ public class Client {
         return userIn.readLine();
     }
 
-    public String recieve() throws IOException {
+    public String receive() throws IOException {
         return in.readLine();
     }
 
-    public void recieveAndLog(int line) throws IOException {
+    public void receiveAndLog(int line) throws IOException {
         for(int i = 0; i < line; i++) {
-            logging(recieve());
+            logging(receive());
         }
     }
 
@@ -70,7 +68,7 @@ public class Client {
     }
 
     private void nameAck() throws NumberFormatException, IOException {
-        int ack = Integer.parseInt(recieve());
+        int ack = Integer.parseInt(receive());
         if (ack == 1) {
             logging("名前が重複しています");
             logging("別の名前にして下さい");
@@ -153,10 +151,10 @@ public class Client {
             if(state == MY_TURN){
                 logging("あなたのターンです");
                 send(Integer.toString(state));// 先に状態を送る
-                recieveAndLog(10);// 技の表示
+                receiveAndLog(10);// 技の表示
                 moveIndexInputAndSend();
-                recieveAndLog(5+3);// 技の結果とHP表示
-                if(recieve().equals("1")){ //ゲーム終了判定
+                receiveAndLog(5+3);// 技の結果とHP表示
+                if(receive().equals("1")){ //ゲーム終了判定
                     state = WIN;
                     break;
                 }else {
@@ -166,9 +164,9 @@ public class Client {
             }else if(state == OPPONENT_TURN){
                 logging("相手のターンです");
                 send(Integer.toString(state));// 先に状態を送る
-                recieveAndLog(5+3);// 技の結果とHP表示
+                receiveAndLog(5+3);// 技の結果とHP表示
                 send("0"); // 技の結果の受け取りを報告
-                if(recieve().equals("1")){ //ゲーム終了判定
+                if(receive().equals("1")){ //ゲーム終了判定
                     state = LOSE;
                     break;
                 }else{
