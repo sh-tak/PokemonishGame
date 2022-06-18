@@ -176,11 +176,12 @@ public class Server extends Thread {
         }
     }
 
-    public boolean canStartBattle(int id){
+    public boolean canStartBattle(int id) throws InterruptedException{
         int oppId = channels[id].opponentId;
         if( channels[oppId].monster != null){
             return true;
         }
+        Thread.sleep(100);
         return false;
     }
 

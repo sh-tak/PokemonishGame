@@ -12,7 +12,7 @@ public class ConsoleClient {
             // コンソールなので標準入力そ引数として渡す。(GUIなら別)
             // GuiClientではテキストフィールドを引数として渡せば良さそう?
             client.connect(new BufferedReader(new InputStreamReader(System.in)));
-            client.receiveAndLog(3); // 接続確認応答を受け取る
+            client.receiveAndLog(2); // 接続確認応答を受け取る
             client.nameInputAndAck(); //モンスターの名前を入力
             client.MonsterTypeInputAndSend(); // モンスターの属性を入力 
             client.logging("あなたのモンスターを生成します");

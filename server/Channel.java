@@ -18,6 +18,7 @@ public class Channel extends Thread {
     public String opponentName = "";
     public int opponentId = -1;
     public Monster monster;
+    private boolean isConnected = false; 
 
     // クライアントの状態。ターンの判定などに使う
     private final String NAME_INPUTTING = "0";
@@ -41,8 +42,8 @@ public class Channel extends Thread {
 
     public void run() {
         send("サーバーに接続しました\n" +
-                "idは" + id + "です\n" +
                 "モンスターの名前を入力してください");
+        isConnected = true;
         try {
             nameAck();
             // 属性をクライアントが指定したモンスターをランダムに生成
@@ -64,7 +65,7 @@ public class Channel extends Thread {
             inBattle();
             close();
 
-        } catch ( IOException e) {
+        } catch ( IOException | InterruptedException e) {
             logging(e);
         }
     }
