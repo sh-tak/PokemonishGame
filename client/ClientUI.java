@@ -35,7 +35,7 @@ public class ClientUI extends JFrame{
     JTextArea logArea;
     JProgressBar hpBar, enemyHp;
 
-    ClientUI() {
+    public ClientUI() {
         setTitle("Pokemonish Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(350, 600);
