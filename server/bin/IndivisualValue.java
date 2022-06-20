@@ -28,6 +28,11 @@ public class IndivisualValue {
     public int getValue(){
         return this.value;
     }
+
+    public int setValue(int value){
+        this.value = value;
+        return this.value;
+    }
     
     public String showStats(){
         if(this.value < 1){

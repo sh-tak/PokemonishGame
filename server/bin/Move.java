@@ -7,14 +7,16 @@ public class Move {
     public static final int STRUGGLE_DAMAGE = 50;
     public String name;
     public int damage;
+    public int maxcount;
     public int count;
     public int typeValue;
     public boolean isPhysical;
 
-    public Move(String name, int damage, int count, int typeValue, boolean isPhysical) {
+    public Move(String name, int damage, int maxcount, int typeValue, boolean isPhysical) {
         this.name = name;
         this.damage = damage;
-        this.count = count;
+        this.maxcount = maxcount;
+        this.count = maxcount;
         this.typeValue = typeValue;
         this.isPhysical = isPhysical;
     }
@@ -110,5 +112,9 @@ public class Move {
 
     public int getStruggleGamage() {
         return new Random().nextInt(STRUGGLE_DAMAGE);
+    }
+
+    public void reset() {
+        this.count = this.maxcount;
     }
 }
