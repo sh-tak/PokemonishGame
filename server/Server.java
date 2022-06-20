@@ -3,20 +3,24 @@ package server;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import server.bin.Monster;
 import server.bin.Move;
-
 
 public class Server extends Thread {
     static int MAX_CONNECTIONS = 128;
     private static final int PORT = 8080;
     ServerSocket serverSocket;
-    Channel channels[] = new Channel[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
-    Move[] moves;
+    ClientInfo clientsInfo[] = new ClientInfo[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
+    Move[] importedMoves;
+    List<Integer> waitingPlayers = new ArrayList<Integer>();// 対戦待ちリスト
 
     public static void main(String[] args) throws IOException {
         new Server();
@@ -30,21 +34,15 @@ public class Server extends Thread {
         try {
             serverSocket = new ServerSocket(PORT);
             System.out.println("サーバーが起動しました\n");
-            moves = fetchMovesFromCsv("./server/bin/moves.csv");
-            int i;
-            while(true){
-                for(i = 0; i < MAX_CONNECTIONS; i++){
-                    if(channels[i] == null){
-                        break;
-                    }
-            }
-            Socket socket = serverSocket.accept();
-            if(i == MAX_CONNECTIONS){
-                socket.close();
-                continue;
-            }
-            channels[i] = new Channel(socket, this,/* id = */i);
-            logging("クライアントid:" + i + "が接続しました");
+            importedMoves = fetchMovesFromCsv("./server/bin/moves.csv");
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            while (true) {
+                if(in.ready()){
+                    String input = in.readLine();
+                    debug(input);
+                }
+                Socket socket = serverSocket.accept();
+                new Channel(socket, this);
             }
         } catch (IOException e) {
             System.out.println("サーバーエラー");
@@ -59,161 +57,91 @@ public class Server extends Thread {
         }
     }
 
-    // 一人のクライアントに対して送信
-    public void sendOne(String msg, int id) {
-        channels[id].out.println(msg);
+    private void debug(String input) {
+        logging("a");
     }
 
-    public void sendTwo(String msg, int id1, int id2) {
-        sendOne(msg, id1);
-        sendOne(msg, id2);
-    }
-
-    // 名前重複確認
-    public boolean isDuplicate(String name) {
+    /*
+     * 確認関連
+     */
+    // 名前が重複していたらtrueを返す
+    public boolean isDuplicateName(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (channels[i] != null && channels[i].name.equals(name)) {
+            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
                 return true;
             }
         }
         return false;
     }
 
-    // サーバーに名前を登録
-    public void setName(String name, int id) {
-        channels[id].name = name;
+    public boolean isGameover(int myId, int opponentId) {
+        if (clientsInfo[myId].monster.hp <= 0) {
+            return true;
+        } else if (clientsInfo[opponentId].monster.hp <= 0) {
+            return true;
+        }
+        return false;
     }
 
-    // 敵が見つかっていないクライアントを探す
-    public String findOpponent(int id) {
+    // 登録した名前が存在してパスワードが正しいかったらtrueを返す
+    public boolean isValidAccount(String name, String password) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (channels[i] != null && 
-                channels[i].opponentId == -1 /*敵が見つかっていない*/&&
-                i != id) {
-                return channels[i].name;
+            if (clientsInfo[i] != null &&
+                    clientsInfo[i].name.equals(name) &&
+                    clientsInfo[i].getPassward().equals(password)) {
+                return true;
             }
-            // 相手側は敵を見つけている。
-            if (channels[i] != null &&
-                !channels[i].opponentName.equals("") &&
-                channels[i].opponentName.equals(channels[id].name)) {
-                return channels[i].name;
+        }
+        return false;
+    }
+
+    // speedの値に応じて自分が先攻ならtrue, 後攻ならfalseを返す
+    public boolean isFirstTurn(int myId, int opponentId) {
+        int mySpeed = clientsInfo[myId].monster.speed.getValue();
+        int opponentSpeed = clientsInfo[opponentId].monster.speed.getValue();
+        if (mySpeed > opponentSpeed) {
+            return true;
+        } else if (mySpeed < opponentSpeed) {
+            return false;
+        } else if (myId < opponentId) {
+            return true;
+        } else {
+            return false;
         }
     }
-        return "";
+
+    public String getNameById(int id) {
+        return clientsInfo[id].name;
     }
 
     public int getIdByName(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (channels[i] != null && channels[i].name == name) {
+            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
                 return i;
             }
         }
         return -1;
     }
-    
-    public void showMoveLineup(int id) {
-        String str  = "技は4種類あります\n";
-        for(int i = 0; i < 4; i++){
-            str +=  "技"+ i + ": " + channels[id].monster.moves[i].toString() + "\n";
-        }
-        str += "使いたい技を数字で入力してください";
-        sendOne(str, id);
-    }
 
-      public boolean isGameover(int myId, int opponentId) {
-        if(channels[myId].monster.hp <= 0) {
-            return true;
-        }else if (channels[opponentId].monster.hp <= 0) {
-            return true;
-        }
-        return false;
-    }
-
-    // 攻撃後にクライアント全員に攻撃結果を表示 moveIdxはクライアントが選択した技の番号
-    public void useMove(int myId, int opponentId, int moveIdx) {
-        String myName = channels[myId].name;
-        String opponentName = channels[opponentId].name;
-        Move myMove = channels[myId].monster.moves[moveIdx];
-        String partition = "--------------";
-        String result;
-
-        // 選んだ技の使用可能回数が0なら悪あがきを繰り出す
-        if (channels[myId].monster.moves[moveIdx].count <= 0) {
-            int damage = channels[myId].monster.moves[moveIdx].getStruggleGamage();
-            channels[opponentId].monster.hp -= damage;
-            channels[myId].monster.hp -= damage/2;
-            result = partition + "\n" +
-                        myName + "は" +
-                        myMove.name + "を使用できません\n" +
-                        "代わりに悪あがきを繰り出した!\n" +
-                        opponentName + "に" +
-                        damage + "のダメージを与えたが自分も" + damage/2 + "のダメージを受けた\n" +
-                        partition;
-            sendTwo(result, myId, opponentId);
-            return;
-        } else {
-            String compatibility;
-            double multiplier = myMove.calculateMultiplier(channels[myId].monster,
-                    channels[opponentId].monster);
-            if(multiplier < 1.0) {
-                compatibility = "効果はいまいちだ\n";
-            }else if(multiplier < 1.5) {
-                compatibility = "効果はまあまあだ\n";
-            }else{
-                compatibility = "効果は抜群だ\n";
+    /*
+     * 登録関連
+     */
+    // 新しいアカウントを登録し、アカウントのidを返す
+    public int addAccount(String name, String password, String monsterType, PrintWriter out) {
+        int i;
+        for (i = 0; i < MAX_CONNECTIONS; i++) {
+            if (clientsInfo[i] == null) {
+                // 技とモンスターはランダムに生成
+                Move[] moves = chooseFourMoves(importedMoves);
+                clientsInfo[i] = new ClientInfo(
+                        i, name, password, new Monster(moves, monsterType), out);
+                break;
             }
-
-            int proccessedDamage = (int) (channels[myId].monster.moves[moveIdx].damage * multiplier);
-            channels[myId].monster.moves[moveIdx].count--;
-            channels[opponentId].monster.hp -= proccessedDamage;
-            result = partition + "\n" +
-                    myName + "は" +
-                    myMove.name + "を使用した!\n" +
-                    compatibility + 
-                    opponentName + "に" +
-                    proccessedDamage + "のダメージを与えた!\n" + partition;
-            sendTwo(result, myId, opponentId);
         }
+        return i;
     }
 
-    public boolean canStartBattle(int id) throws InterruptedException{
-        int oppId = channels[id].opponentId;
-        if( channels[oppId].monster != null){
-            return true;
-        }
-        Thread.sleep(100);
-        return false;
-    }
-
-    public void showStats(int id){
-        sendOne(channels[id].monster.toString(), id);
-    }
-
-    public int isFirstTurn(int id) {
-        int mySpeed = channels[id].monster.speed.getValue();
-        int oppId = channels[id].opponentId;
-        int opponentSpeed = channels[oppId].monster.speed.getValue();
-        if(mySpeed > opponentSpeed) {
-            return 1;
-        }else if(mySpeed < opponentSpeed) {
-            return 0;
-        }else if(id < oppId) {
-            return 1;
-        }else{
-            return 0;
-        }
-    }
-
-    public void showCurrentHp(int myId, int opponentId) {
-        sendTwo("現在の" + channels[myId].monster.name + "のHPは " + 
-            (channels[myId].monster.hp > 0 ? channels[myId].monster.hp : "0") + "です"
-            , myId, opponentId);
-        sendTwo("現在の" + channels[opponentId].monster.name + "のHPは " + 
-            (channels[opponentId].monster.hp > 0 ? channels[opponentId].monster.hp : "0") + "です\n"
-            , myId, opponentId);
-    }
-
-    // csvファイルmoves.csvから技リストを読み込む
+    // csvファイルmoves.csvから全ての技リストを読み込む(サーバー起動時に呼び出し)
     public Move[] fetchMovesFromCsv(String filename) {
         int i = 0;
         try {
@@ -244,6 +172,7 @@ public class Server extends Thread {
         return null;
     }
 
+    // 4つのランダムに選んだ技を返す(モンスター生成時に呼び出し)
     public Move[] chooseFourMoves(Move[] moves) {
         // 実例: moves.length = 5 のとき[0,1,2,3,4]をシャッフルして[2,3,1,4,0]
         // のようになる。このときmoves[2], moves[3], moves[1], moves[4]のリストを返す。
@@ -259,6 +188,126 @@ public class Server extends Thread {
             returnMove[i] = moves[list.get(i)];
         }
         return returnMove;
+    }
+
+    // 相手を探して、相手のidを返す
+    public int findOpponent(int id) throws InterruptedException {
+        waitingPlayers.add(id);
+        while (true) {
+            Thread.sleep(100);
+            // 自分の前に対戦待ちが1人以下かつ、自分の後ろか前に対戦待ちがいたらその人と対戦
+            if (waitingPlayers.indexOf(id) < 2 && waitingPlayers.size() > 1) {
+                return waitingPlayers.get(waitingPlayers.indexOf(id) == 1 ? 0 : 1);
+            }
+        }
+    }
+
+    // 対戦開始前に対戦開始リストから削除する
+    public void removeWaitingPlayer(int id) {
+        if(waitingPlayers.indexOf(id) == 0) {
+            waitingPlayers.remove(1);
+            waitingPlayers.remove(0);
+        }
+    }
+
+    // ステータスを選んで3上げる
+    public void levelUp(int id, int status){
+        if(status == 1){
+            int val = clientsInfo[id].monster.health.getValue();
+            clientsInfo[id].monster.health.setValue(val + 3);
+        }else if(status == 2){
+            int val = clientsInfo[id].monster.attack.getValue();
+            clientsInfo[id].monster.attack.setValue(val + 3);
+        }else if(status == 3){
+            int val = clientsInfo[id].monster.block.getValue();
+            clientsInfo[id].monster.block.setValue(val + 3);
+        }else if(status == 4){
+            int val = clientsInfo[id].monster.contact.getValue();
+            clientsInfo[id].monster.contact.setValue(val + 3);
+        }else if(status == 5){
+            int val = clientsInfo[id].monster.defense.getValue();
+            clientsInfo[id].monster.defense.setValue(val + 3);
+        }else if(status == 6){
+            int val = clientsInfo[id].monster.speed.getValue();
+            clientsInfo[id].monster.speed.setValue(val + 3);
+        }
+    }
+
+    /*
+     * バトル関連
+     */
+    public void showStats(int id) {
+        clientsInfo[id].send(clientsInfo[id].monster.toString());
+    }
+
+    public void showMoveLineup(int id) {
+        String str = "技は4種類あります\n";
+        for (int i = 1; i < 5; i++) {
+            str += "技" + i + ": " + clientsInfo[id].monster.moves[i-1].toString() + "\n";
+        }
+        str += "使いたい技を数字で入力してください";
+        clientsInfo[id].send(str);
+    }
+
+    // 攻撃後にクライアント全員に攻撃結果を表示 moveIdxはクライアントが選択した技の番号
+    public void useMove(int myId, int opponentId, int moveIdx) {
+        String myName = clientsInfo[myId].name;
+        String opponentName = clientsInfo[opponentId].name;
+        Move myMove = clientsInfo[myId].monster.moves[moveIdx];
+        String partition = "--------------";
+        String result;
+
+        // 選んだ技の使用可能回数が0なら悪あがきを繰り出す
+        if (clientsInfo[myId].monster.moves[moveIdx].count <= 0) {
+            int damage = clientsInfo[myId].monster.moves[moveIdx].getStruggleGamage();
+            clientsInfo[opponentId].monster.hp -= damage;
+            clientsInfo[myId].monster.hp -= damage / 2;
+            result = partition + "\n" +
+                    myName + "は" +
+                    myMove.name + "を使用できません\n" +
+                    "代わりに悪あがきを繰り出した!\n" +
+                    opponentName + "に" +
+                    damage + "のダメージを与えたが自分も" + damage / 2 + "のダメージを受けた\n" +
+                    partition;
+            clientsInfo[myId].send(result);
+            clientsInfo[opponentId].send(result);
+            return;
+        } else {
+            String compatibility;
+            double multiplier = myMove.calculateMultiplier(clientsInfo[myId].monster,
+                    clientsInfo[opponentId].monster);
+            if (multiplier < 1.0) {
+                compatibility = "効果はいまいちだ\n";
+            } else if (multiplier < 1.5) {
+                compatibility = "効果はまあまあだ\n";
+            } else {
+                compatibility = "効果は抜群だ\n";
+            }
+
+            int proccessedDamage = (int) (clientsInfo[myId].monster.moves[moveIdx].damage * multiplier);
+            clientsInfo[myId].monster.moves[moveIdx].count--;
+            clientsInfo[opponentId].monster.hp -= proccessedDamage;
+            result = partition + "\n" +
+                    myName + "は" +
+                    myMove.name + "を使用した!\n" +
+                    compatibility +
+                    opponentName + "に" +
+                    proccessedDamage + "のダメージを与えた!\n" + partition;
+            clientsInfo[myId].send(result);
+            clientsInfo[opponentId].send(result);
+        }
+    }
+
+    public void showCurrentHp(int myId, int opponentId) {
+        int myHp = clientsInfo[myId].monster.hp;
+        int opponentHp = clientsInfo[opponentId].monster.hp;
+        String str = "現在の" + clientsInfo[myId].name + "のHPは " +
+                (myHp > 0 ? myHp : "0") + "です\n" +
+                "現在の" + clientsInfo[opponentId].name + "のHPは " +
+                (opponentHp > 0 ? opponentHp : "0") + "です\n" +
+                "-------------";
+        clientsInfo[myId].send(str);
+        clientsInfo[opponentId].send(str);
     }
 
     public void logging(String str) {

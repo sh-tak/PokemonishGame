@@ -11,10 +11,10 @@ public class Monster {
     public String type;// 属性
     public Move moves[];// 技; 
     public int sum;// 個体値
-    public int hp;// 実hp
+    public int maxHp;// 実hp
+    public int hp;
 
-    public Monster(Move moves[], String name, String type) {
-        this.name = name;
+    public Monster(Move moves[], String type) {
         this.health = new IndivisualValue("HP");
         this.attack = new IndivisualValue("攻撃");
         this.block = new IndivisualValue("防御");
@@ -24,7 +24,8 @@ public class Monster {
         this.type = type;
         this.sum = this.health.getValue() + this.attack.getValue() + this.block.getValue() +
             this.contact.getValue() + this.defense.getValue() + this.speed.getValue();
-        this.hp = (this.sum * 2 + this.health.getValue()) + 110;
+        this.maxHp = (this.sum * 2 + this.health.getValue()) + 110;
+        this.hp = this.maxHp;
         this.moves = moves;
     }
 
@@ -72,6 +73,31 @@ public class Monster {
         return type;
     }
 
+    public static String val2stats(int value){
+        String stats = "";
+        switch(value){
+            case 1:
+                stats = "health";
+                break;
+            case 2:
+                stats = "攻撃";
+                break;
+            case 3:
+                stats = "防御";
+                break;
+            case 4:
+                stats = "特攻";
+                break;
+            case 5:
+                stats = "特防";
+                break;
+            case 6:
+                stats = "素早さ";
+                break;
+        }
+        return stats;
+    }
+
     public String getType(){
         return this.type;
     }
@@ -92,7 +118,7 @@ public class Monster {
 
        // Rem: 10行 
         return (partition + "\n" +
-                "属性は " + getType() + "\n" + 
+                "属性は " + val2type(Integer.parseInt(getType())) + "\n" + 
                 "hp値は " + health.getValue() + "\n" +
                 "攻撃は " + attack.getValue() + "\n" +
                 "防御は " + block.getValue() + "\n" +
@@ -102,7 +128,12 @@ public class Monster {
                 "総合評価: " + evaluation + "\n" +
                 partition );
     }
+
     public void decreaseHp(int damage) {
         this.hp -= damage;
+    }
+
+    public void resetHp() {
+        this.hp = this.maxHp;
     }
 }
