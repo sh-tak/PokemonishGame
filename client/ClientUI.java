@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class ClientUI extends JFrame{
     
-    public static void main(String[] args) {
+/*     public static void main(String[] args) {
         // debug
         ClientUI client = new ClientUI();
         client.setStatus("newStatus");
@@ -27,7 +27,7 @@ public class ClientUI extends JFrame{
 
         client.setEnemyImage("client/image/a.png");
     }
-    
+ */    
     JLabel imageLabel, enemyImage;
     JLabel statusLabel, enemyStatus;
     JList<String> wazaList;
@@ -90,7 +90,7 @@ public class ClientUI extends JFrame{
         okButton.addActionListener(a);
     }
 
-    public void log(String log) {
+    public void logging(String log) {
         logArea.append(log);
     }
 
