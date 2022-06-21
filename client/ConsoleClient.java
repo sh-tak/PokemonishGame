@@ -136,7 +136,7 @@ public class ConsoleClient {
                 client.logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御　4:特攻 5:特防 6:素早さ");
                 String status = client.input("status");
                 client.send(status);
-                client.receiveAndLog(1);
+                client.receiveAndLog(1 + 10);
             }
         } catch (IOException e) {
             e.printStackTrace();

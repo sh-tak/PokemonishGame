@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Server extends Thread {
     ClientInfo clientsInfo[] = new ClientInfo[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
     Move[] importedMoves;
     List<Integer> waitingPlayers = new ArrayList<Integer>();// 対戦待ちリスト
+    List<String> registeList = new ArrayList<String>();// 登録リスト
 
     public static void main(String[] args) throws IOException {
         new Server();
@@ -71,6 +73,11 @@ public class Server extends Thread {
                 return true;
             }
         }
+        for(int i = 0; i < registeList.size(); i++){
+            if(registeList.get(i).equals(name)){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -84,11 +91,19 @@ public class Server extends Thread {
     }
 
     // 登録した名前が存在してパスワードが正しいかったらtrueを返す
-    public boolean isValidAccount(String name, String password) {
+    public boolean isValidAccount(String name, String password) throws NoSuchAlgorithmException {
+        byte[] hashedPassword = ClientInfo.getHashedPass(password);
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (clientsInfo[i] != null &&
-                    clientsInfo[i].name.equals(name) &&
-                    clientsInfo[i].getPassward().equals(password)) {
+            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
+                byte[] storedPassword = clientsInfo[i].getPassward();
+                if(storedPassword.length != hashedPassword.length){
+                    return false;
+                }
+                for(int j = 0; j < hashedPassword.length; j++){
+                    if(storedPassword[j] != hashedPassword[j]){
+                        return false;   
+                    }
+                }
                 return true;
             }
         }
@@ -127,14 +142,14 @@ public class Server extends Thread {
      * 登録関連
      */
     // 新しいアカウントを登録し、アカウントのidを返す
-    public int addAccount(String name, String password, String monsterType, PrintWriter out) {
+    public int addAccount(String name, String plainPassword, String monsterType, PrintWriter out) throws NoSuchAlgorithmException {
         int i;
         for (i = 0; i < MAX_CONNECTIONS; i++) {
             if (clientsInfo[i] == null) {
                 // 技とモンスターはランダムに生成
                 Move[] moves = chooseFourMoves(importedMoves);
                 clientsInfo[i] = new ClientInfo(
-                        i, name, password, new Monster(moves, monsterType), out);
+                        i, name, plainPassword, new Monster(moves, monsterType), out);
                 break;
             }
         }

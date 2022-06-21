@@ -1,32 +1,39 @@
 package server;
 
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import server.bin.Monster;
 
 public class ClientInfo{
     public int id;
     public String name;
-    private String hashedPassword;
+    private byte[] hashedPassword;
     public Monster monster;
     private PrintWriter out;
     boolean online;
 
-    ClientInfo(int id, String name, String hashedPassword, Monster monster, PrintWriter out) {
+    ClientInfo(int id, String name, String plainPassword, Monster monster, PrintWriter out) throws NoSuchAlgorithmException {
         this.id = id;
         this.name = name;
-        this.hashedPassword = hashedPassword;
+        this.hashedPassword = getHashedPass(plainPassword);
         this.monster = monster;
         this.out = out;
         this.online = true; //ログイン判定で使うかも
     }
 
-    public String getPassward() {
+    public byte[] getPassward() {
         return hashedPassword;
     }
 
     // ログインした時に呼び出す
     public void login(PrintWriter out) {
         this.online = true;
+        monster.resetHp();
+        for(int i = 0; i < 4; i++) {
+            monster.moves[i].reset();
+        }
         this.out = out;
     } 
     
@@ -43,5 +50,10 @@ public class ClientInfo{
         if (out != null) {
             out.println(message);
         }
+    }
+    public static byte[] getHashedPass(String plainText) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] b = plainText.getBytes();
+        return md.digest(b);
     }
 }
