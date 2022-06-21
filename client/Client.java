@@ -139,7 +139,7 @@ public class Client {
         }
         if(InputType.equals("status")){
             String s = read();
-            while (!isValidTypeInput(s)) {
+            while (!isValidStatsInput(s)) {
                 logging("1: hp, 2: 攻撃, 3: 防御, 4: 特攻, 5: 特防 6:素早さ");
                 logging("1~6の数字を入力してください");
                 s = read();
