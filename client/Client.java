@@ -9,32 +9,31 @@ import java.net.Socket;
 public class Client {
     private static final int PORT = 8080;
     Socket socket = null;
-    BufferedReader in = null; //サーバからの受信
+    BufferedReader in = null; // サーバからの受信
     PrintWriter out = null; // サーバーに送信
     BufferedReader userIn = null; // ユーザーからの入力 コンソールなら標準入力
 
-    private static final int NAME_INPUTTING = 0;
-    private static final int WAIT_FOR_NAME_ACK = 1;
-    private static final int WAIT_FOR_OPPONENT = 2;
     private static final int MY_TURN = 3;
     private static final int OPPONENT_TURN = 4;
     private static final int WIN = 5;
     private static final int LOSE = 6;
-    private int state = NAME_INPUTTING;
+    private int state;
 
-    public void connect(BufferedReader userIn) throws IOException {
-        try {
+    Client(BufferedReader userIn) {
+        this.userIn = userIn;
+        try{
             socket = new Socket("localhost", PORT);
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            this.userIn = userIn;
-            state = NAME_INPUTTING;
-        } catch (IOException e) {
-            logging("接続失敗");
+        }catch(IOException e){
+            logging("接続エラー");
         }
     }
-   
+
+    /*
+     * 送受信、ログ、　入力関連の設定
+     */
     public void logging(Object s) {
         System.out.println(s);
     }
@@ -48,7 +47,7 @@ public class Client {
     }
 
     public void receiveAndLog(int line) throws IOException {
-        for(int i = 0; i < line; i++) {
+        for (int i = 0; i < line; i++) {
             logging(receive());
         }
     }
@@ -57,130 +56,116 @@ public class Client {
         out.println(s);
     }
 
-    private void nameInputAndSend() throws IOException {
-        String name =  read();
-        while (name == null || name.equals("")) {
-            logging("名前は一文字以上で入力してください");
-            name = read();
-        }
-        send(name);
-        state = WAIT_FOR_NAME_ACK;
+    /*
+     * ユーザ入力の判定関連
+     */
+    private boolean isValidYesNoInput(String val) {
+        return val.equals("Yes") ||
+                val.equals("No") ||
+                val.equals("yes") ||
+                val.equals("no");
     }
 
-    private void nameAck() throws NumberFormatException, IOException {
-        int ack = Integer.parseInt(receive());
-        if (ack == 1) {
-            logging("名前が重複しています");
-            logging("別の名前にして下さい");
-            state = NAME_INPUTTING;
-        } else {
-            logging("名前を登録しました");
-            state = WAIT_FOR_OPPONENT;
-            send(Integer.toString(state)); //最後に状態遷移を確認させて終了
-        }
-    }
-
-    public void nameInputAndAck() throws IOException, InterruptedException {
-        while (state == NAME_INPUTTING) {
-            send(Integer.toString(state));// 先に状態を送る 
-            nameInputAndSend();
-            nameAck(); // サーバからの確認待ち
-        }
-    }
-
-    public void MonsterTypeInputAndSend() throws IOException {
-        logging("モンスターの属性を選択してください");
-        logging("1: 火 2: 水 3: 草 4: 光 5: 闇");
-        String val = read();
-        while (!isValidTypeInput(val)) {
-            logging("1から5の数字で入力して下さい");
-            logging("1: 火 2: 水 3: 草 4: 光 5: 闇");
-            val = read();
-        }
-        send(val);
-    }
-
-    // 技の番号の入力の判定に使う
     private boolean isValidMoveInput(String str) {
-        if(str.equals("0") || 
-            str.equals("1") || 
-            str.equals("2") || 
-            str.equals("3")) {
+        if (str.equals("1") ||
+                str.equals("2") ||
+                str.equals("3") ||
+                str.equals("4")) {
             return true;
         }
         return false;
+    }
+
+    private boolean isValidTypeInput(String str) {
+        if (str.equals("1") ||
+                str.equals("2") ||
+                str.equals("3") ||
+                str.equals("4") ||
+                str.equals("5")) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidStatsInput(String str) {
+        if (str.equals("1") ||
+                str.equals("2") ||
+                str.equals("3") ||
+                str.equals("4") ||
+                str.equals("5") ||
+                str.equals("6")) {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+    * ユーザ入力関連
+    */
+    public boolean yesNoInput() throws IOException {
+        String s = read();
+        while (!isValidYesNoInput(s)) {
+            logging("Yes or Noを入力してください");
+            s = read();
+        }
+        if (s.equals("Yes") || s.equals("yes")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 4種類のinputType : move, type, name, password, stats
+    public String input(String InputType) throws IOException {
+        while (userIn.ready()) { // 相手のターン中の入力を捨てる。StackOverFlow
+            read();
+        }
+        if(InputType.equals("move")){
+            String s = read();
+            while (!isValidMoveInput(s)) {
+                logging("1~4の数字を入力してください");
+                s = read();
+            }
+            return s;
+        }
+        if(InputType.equals("type")){
+            String s = read();
+            while (!isValidTypeInput(s)) {
+                logging("1: 火, 2: 水, 3: 草, 4: 光, 5: 闇");
+                logging("1~5の数字を入力してください");
+                s = read();
+            }
+            return s;
+        }
+        if(InputType.equals("status")){
+            String s = read();
+            while (!isValidTypeInput(s)) {
+                logging("1: hp, 2: 攻撃, 3: 防御, 4: 特攻, 5: 特防 6:素早さ");
+                logging("1~6の数字を入力してください");
+                s = read();
+            }
+            return s;
+        }
+
+        String tmp = "";
+        if (InputType.equals("name")) {
+            tmp = "名前";
+        } else if (InputType.equals("password")) {
+            tmp = "パスワード";
+        }
+        String str = read();
+        while (str == null || str.equals("")) {
+            logging(tmp + "を1文字以上で入力してください");
+            str = read();
+        }
+        return str;
     }
     
-    // 属性の入力に用いる   
-    private boolean isValidTypeInput(String str) {
-        if(str.equals("1") || 
-            str.equals("2") || 
-            str.equals("3") || 
-            str.equals("4") || 
-            str.equals("5")) {
-            return true;
-        }
-        return false;
+    public int getState() {
+        return state;
     }
 
-    public void moveIndexInputAndSend() throws IOException, InterruptedException{
-        while(userIn.ready()){ // 相手のターン中の入力を捨てる。StackOverFlow
-                read();
-        }
-        String moveIndex = read();
-        while (!isValidMoveInput(moveIndex)) {
-            logging("0~3の数字を入力してください");
-            moveIndex = read();
-        }
-        send(moveIndex);
-    }
-
-    public void initTurn(String turn) throws IOException {
-        if (turn.equals("1")) {
-            logging("あなたは先攻です");
-            state = MY_TURN;
-        } else {
-            logging("あなたは後攻です");
-            state = OPPONENT_TURN;
-        }
-    }
-
-    // バトル中のループを行う関数 バトルが終わったらこの関数のループから抜ける
-    public void inBattle() throws IOException, InterruptedException {
-        while(state != WIN && state != LOSE) {
-            if(state == MY_TURN){
-                logging("あなたのターンです");
-                send(Integer.toString(state));// 先に状態を送る
-                receiveAndLog(10);// 技の表示
-                moveIndexInputAndSend();
-                receiveAndLog(5+3);// 技の結果とHP表示
-                if(receive().equals("1")){ //ゲーム終了判定
-                    state = WIN;
-                    break;
-                }else {
-                    state = OPPONENT_TURN;
-                }
-
-            }else if(state == OPPONENT_TURN){
-                logging("相手のターンです");
-                send(Integer.toString(state));// 先に状態を送る
-                receiveAndLog(5+3);// 技の結果とHP表示
-                send("0"); // 技の結果の受け取りを報告
-                if(receive().equals("1")){ //ゲーム終了判定
-                    state = LOSE;
-                    break;
-                }else{
-                    state = MY_TURN;
-                }
-            }
-        }
-    }
-
-    public void showBattleResult() throws IOException {
-        if(state == WIN){
-            logging("あなたの勝ちです");
-        }else if(state == LOSE){
-            logging("あなたの負けです");
-        }
+    public void setState(int state) {
+        this.state = state;
     }
 }
