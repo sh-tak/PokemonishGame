@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 
 import server.bin.Monster;
 
@@ -65,11 +66,17 @@ public class Channel extends Thread {
 						send("duplicate");
 					} else {
 						send("correct");
+						if (!server.registeList.contains(name)) { // 同時に登録している時に重複しないようにリストで名前を保存
+						server.registeList.add(name);
+						}
 						break;
 					}
 				}
 				password = receive();
 				monsterType = receive();
+				if (server.registeList.contains(name)) {
+					server.registeList.remove(server.registeList.indexOf(name));
+				}
 				id = server.addAccount(name, password, monsterType, this.out);
 			}
 
@@ -108,13 +115,14 @@ public class Channel extends Thread {
 				}
 			}
 			Thread.sleep(500);
-			if(receive().equals("WIN")){
+			if (receive().equals("WIN")) {
 				server.showStats(id);
 				int status = Integer.parseInt(receive());
 				server.levelUp(id, status);
 				send(Monster.val2stats(status) + "が3点上がりました");
+				server.showStats(id);
 			}
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException | InterruptedException | NoSuchAlgorithmException e) {
 			System.out.println("クライアント切断");
 		} finally {
 			server.clientsInfo[id].logout();
