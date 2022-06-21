@@ -94,7 +94,9 @@ public class Server extends Thread {
     public boolean isValidAccount(String name, String password) throws NoSuchAlgorithmException {
         byte[] hashedPassword = ClientInfo.getHashedPass(password);
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
+            if (clientsInfo[i] != null && 
+                clientsInfo[i].name.equals(name) &&
+                !clientsInfo[i].online) {
                 byte[] storedPassword = clientsInfo[i].getPassward();
                 if(storedPassword.length != hashedPassword.length){
                     return false;
