@@ -19,6 +19,7 @@ public class Client {
     private static final int LOSE = 6;
     private int state;
 
+
     // クライアント生成？時にユーザ入力を定義する。(標準入力とか)
     Client(BufferedReader userIn) {
         this.userIn = userIn;
