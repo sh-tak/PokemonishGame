@@ -21,8 +21,11 @@ public class Server extends Thread {
     ServerSocket serverSocket;
     ClientInfo clientsInfo[] = new ClientInfo[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
     Move[] importedMoves;
+    // 対戦待ちの人のリスト
     List<Integer> waitingPlayers = new ArrayList<Integer>();// 対戦待ちリスト
-    List<String> registeList = new ArrayList<String>();// 登録リスト
+    // 登録最中の人のリスト、サーバに名前(アカウント)が登録されるのはパスワードを設定してからなので
+    // パスワード設定中に他の人が同じ名前で登録してしまわないようにこのリストを使う
+    List<String> registeList = new ArrayList<String>();
 
     public static void main(String[] args) throws IOException {
         new Server();
@@ -37,8 +40,11 @@ public class Server extends Thread {
             serverSocket = new ServerSocket(PORT);
             System.out.println("サーバーが起動しました\n");
             importedMoves = fetchMovesFromCsv("./server/bin/moves.csv");
+            // debug用のin server.debug関数を定義するとサーバー側で標準入力して確認に使える
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
+                // 接続待ちの時はsocket.acceptの部分でブロッキングされるのでdebug関数が呼び出されるのは
+                // クライアントが接続された直後
                 if(in.ready()){
                     String input = in.readLine();
                     debug(input);
@@ -60,7 +66,11 @@ public class Server extends Thread {
     }
 
     private void debug(String input) {
-        logging("a");
+        // サーバー側でrenewmoveと打つと技を更新する。
+        //　サーバーを起動した後でも技を追加削除できる
+        if(input.equals("renewmove")){
+            fetchMovesFromCsv("./server/bin/moves.csv");
+        }
     }
 
     /*
@@ -118,7 +128,7 @@ public class Server extends Thread {
             return true;
         } else if (mySpeed < opponentSpeed) {
             return false;
-        } else if (myId < opponentId) {
+        } else if (myId < opponentId) { //mySpeed=opponentSpeedのとき
             return true;
         } else {
             return false;
@@ -195,7 +205,7 @@ public class Server extends Thread {
         for (int i = 0; i < moves.length; i++) {
             list.add(i);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 30; i++) { 
             Collections.shuffle(list);
         }
         Move returnMove[] = new Move[4];
@@ -217,7 +227,7 @@ public class Server extends Thread {
         }
     }
 
-    // 対戦開始前に対戦開始リストから削除する
+    // 対戦開始前に対戦開始待ちリストから削除する
     public void removeWaitingPlayer(int id) {
         if(waitingPlayers.indexOf(id) == 0) {
             waitingPlayers.remove(1);
