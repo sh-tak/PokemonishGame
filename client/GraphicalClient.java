@@ -3,48 +3,73 @@ package client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.awt.event.*;
+import javax.swing.*;
+
+
 
 public class GraphicalClient {
     final static int MY_TURN = 3;
     final static int OPPONENT_TURN = 4;
     private static final int WIN = 5;
     private static final int LOSE = 6;
+    
+    private static ClientUI gClient;
+    private static Client cClient;
 
-    private static void logging() {
-        
+    private static void logging(String str) {
+
     }
 
     public static void main(String[] args) {
-        try {
-            ClientUI gClient = new ClientUI();
+        // initialize gui
+        gClient = new ClientUI();
+        gClient.setStatus("HP");
+        String[] testWaza = {"waza1", "waza2", "waza3", "waza4"};
+        gClient.setWaza(testWaza);
+        gClient.setImage(-1, "client/image/background.png");
+        gClient.setImage(0, "client/image/a.png");
+        gClient.setHP(0, 160, 250);
+        gClient.setButtonAction(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog
+                (null, gClient.getSelectedWaza());
+            }
+        });
+        gClient.clearLog();
+        
+        gClient.setHP(1, 10, 140);
+        gClient.setImage(1, "client/image/a.png");
+
+        try{
             // ユーザー入力を標準入力に設定。サーバーと接続
-            Client client = new Client(new BufferedReader(
+            cClient = new Client(new BufferedReader(
                     new InputStreamReader(System.in)));
-            client.receiveAndLog(1); // 接続確認応答を受け取る
-            client.logging("新しく始めますか?(Yes/No)");
-            boolean isNewAccount = client.yesNoInput();
-            client.send(isNewAccount ? "new" : "login");
+            cClient.receiveAndLog(1); // 接続確認応答を受け取る
+            cClient.logging("新しく始めますか?(Yes/No)");
+            boolean isNewAccount = cClient.yesNoInput();
+            cClient.send(isNewAccount ? "new" : "login");
             if (!isNewAccount) {// ログインして始める
                 while (true) {
-                    client.logging("登録済みの名前を入力してください");
-                    String inname = client.input("name");
-                    client.logging("パスワードを入力してください");
-                    String inpass = client.input("pass");
-                    client.send(inname);
-                    client.send(inpass);
-                    String ack = client.receive();
+                    cClient.logging("登録済みの名前を入力してください");
+                    String inname = cClient.input("name");
+                    cClient.logging("パスワードを入力してください");
+                    String inpass = cClient.input("pass");
+                    cClient.send(inname);
+                    cClient.send(inpass);
+                    String ack = cClient.receive();
                     if (ack.equals("correct")) {
-                        client.logging("ログインしました");
+                        cClient.logging("ログインしました");
                         break;
                     } else {
-                        client.logging("名前またはパスワードが間違っています\n" +
+                        cClient.logging("名前またはパスワードが間違っています\n" +
                                 "もう一度入力しますか?(Yes) 新規登録しますか?(No)");
-                        if (client.yesNoInput()) {
-                            client.send("onemore");
+                        if (cClient.yesNoInput()) {
+                            cClient.send("onemore");
                             continue;
                         } else {
                             isNewAccount = true;
-                            client.send("quit");
+                            cClient.send("quit");
                             break;
                         }
                     }
@@ -53,95 +78,95 @@ public class GraphicalClient {
             if (isNewAccount) {// 新規登録
                 while (true) {
                     String name;
-                    client.logging("新規の名前を入力してください");
-                    name = client.input("name");
-                    client.send(name);
-                    if (client.receive().equals("duplicate")) {
-                        client.logging("その名前は使用できません");
+                    cClient.logging("新規の名前を入力してください");
+                    name = cClient.input("name");
+                    cClient.send(name);
+                    if (cClient.receive().equals("duplicate")) {
+                        cClient.logging("その名前は使用できません");
                     } else {
                         break;
                     }
                 }
                 while (true) {
                     String password1, password2;
-                    client.logging("パスワードを入力してください");
-                    password1 = client.input("pass");
-                    client.logging("パスワードを再度入力してください");
-                    password2 = client.input("pass");
+                    cClient.logging("パスワードを入力してください");
+                    password1 = cClient.input("pass");
+                    cClient.logging("パスワードを再度入力してください");
+                    password2 = cClient.input("pass");
                     if (password1.equals(password2)) {
-                        client.send(password1);
-                        client.logging("登録しました");
+                        cClient.send(password1);
+                        cClient.logging("登録しました");
                         break;
                     } else {
-                        client.logging("パスワードが一致しません\n" +
+                        cClient.logging("パスワードが一致しません\n" +
                                 "1から入力し直してください");
                     }
                 }
-                client.logging("モンスターの属性を選択してください\n" +
+                cClient.logging("モンスターの属性を選択してください\n" +
                         "1: 火 2: 水 3: 草  4: 光  5: 闇");
-                String monsterType = client.input("type");
-                client.send(monsterType);
+                String monsterType = cClient.input("type");
+                cClient.send(monsterType);
             }
 
-            client.receiveAndLog(10);// モンスター情報を受け取る
-            client.logging("対戦相手を探しています");
-            client.receiveAndLog(2); // 対戦相手を表示
+            cClient.receiveAndLog(10);// モンスター情報を受け取る
+            cClient.logging("対戦相手を探しています");
+            cClient.receiveAndLog(2); // 対戦相手を表示
 
             // 対戦
-            if (client.receive().equals("first")) {
-                client.logging("あなたが先攻です");
-                client.setState(MY_TURN);
+            if (cClient.receive().equals("first")) {
+                cClient.logging("あなたが先攻です");
+                cClient.setState(MY_TURN);
             } else {// receive() == "second"
-                client.logging("あなたが後攻です");
-                client.setState(OPPONENT_TURN);
+                cClient.logging("あなたが後攻です");
+                cClient.setState(OPPONENT_TURN);
             }
 
             // 対戦開始
-            client.logging("対戦を開始します");
-            while (client.getState() != WIN && client.getState() != LOSE) {
-                if (client.getState() == MY_TURN) {
+            cClient.logging("対戦を開始します");
+            while (cClient.getState() != WIN && cClient.getState() != LOSE) {
+                if (cClient.getState() == MY_TURN) {
                     String moveIndex;
-                    client.logging("あなたのターンです");
-                    client.send(Integer.toString(client.getState()));// 先に状態を送る
-                    client.receiveAndLog(10);// 技の表示
-                    moveIndex = client.input("move");
-                    client.send(Integer.toString(Integer.parseInt(moveIndex) - 1));
-                    client.receiveAndLog(5 + 3);// 技の結果とHP表示
-                    if (client.receive().equals("gameisover")) { // ゲーム終了判定
-                        client.setState(WIN);
+                    cClient.logging("あなたのターンです");
+                    cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
+                    cClient.receiveAndLog(10);// 技の表示
+                    moveIndex = cClient.input("move");
+                    cClient.send(Integer.toString(Integer.parseInt(moveIndex) - 1));
+                    cClient.receiveAndLog(5 + 3);// 技の結果とHP表示
+                    if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
+                        cClient.setState(WIN);
                         break;
                     } else {
-                        client.setState(OPPONENT_TURN);
+                        cClient.setState(OPPONENT_TURN);
                     }
-                } else if (client.getState() == OPPONENT_TURN) {
-                    client.logging("相手のターンです");
-                    client.send(Integer.toString(client.getState()));// 先に状態を送る
-                    client.receiveAndLog(5 + 3);// 技の結果とHP表示
-                    client.send("resultreceived"); // 技の結果の受け取りを報告
-                    if (client.receive().equals("gameisover")) { // ゲーム終了判定
-                        client.setState(LOSE);
+                } else if (cClient.getState() == OPPONENT_TURN) {
+                    cClient.logging("相手のターンです");
+                    cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
+                    cClient.receiveAndLog(5 + 3);// 技の結果とHP表示
+                    cClient.send("resultreceived"); // 技の結果の受け取りを報告
+                    if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
+                        cClient.setState(LOSE);
                         break;
                     } else {
-                        client.setState(MY_TURN);
+                        cClient.setState(MY_TURN);
                     }
                 }
             }
             // 対戦結果の表示
-            if (client.getState() == WIN) {
-                client.logging("あなたの勝ちです");
-            } else if (client.getState() == LOSE) {
-                client.logging("あなたの負けです");
+            if (cClient.getState() == WIN) {
+                cClient.logging("あなたの勝ちです");
+            } else if (cClient.getState() == LOSE) {
+                cClient.logging("あなたの負けです");
             }
-            if(client.getState() == LOSE) {
-                client.send("LOSE");
-            }else if(client.getState() == WIN){
-                client.send("WIN");
-                client.receiveAndLog(10);
-                client.logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
-                client.logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御　4:特攻 5:特防 6:素早さ");
-                String status = client.input("status");
-                client.send(status);
-                client.receiveAndLog(1 + 10);
+            if(cClient.getState() == LOSE) {
+                cClient.send("LOSE");
+            }else if(cClient.getState() == WIN){
+                cClient.send("WIN");
+                cClient.receiveAndLog(10);
+                cClient.logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
+                cClient.logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御　4:特攻 5:特防 6:素早さ");
+                String status = cClient.input("status");
+                cClient.send(status);
+                cClient.receiveAndLog(1 + 10);
             }
         } catch (IOException e) {
             e.printStackTrace();
