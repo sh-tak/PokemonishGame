@@ -166,7 +166,7 @@ public class ClientUI extends JFrame{
         this.okButton.addActionListener(a);
     }
 
-    public void log(String log) {
+    public void logging(String log) {
         this.logArea.append(log);
     }
 
