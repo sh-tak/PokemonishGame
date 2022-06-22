@@ -77,7 +77,7 @@ public class Server extends Thread {
      * 確認関連
      */
     // 名前が重複していたらtrueを返す
-    public boolean isDuplicateName(String name) {
+    public boolean isDuplicationName(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
                 return true;
