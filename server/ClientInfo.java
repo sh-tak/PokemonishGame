@@ -51,6 +51,7 @@ public class ClientInfo{
             out.println(message);
         }
     }
+
     public static byte[] getHashedPass(String plainText) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] b = plainText.getBytes();

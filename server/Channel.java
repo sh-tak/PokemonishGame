@@ -34,6 +34,7 @@ public class Channel extends Thread {
 		this.start();
 	}
 
+	// クライアントの1回の対戦に対応
 	public void run() {
 		try {
 			send("サーバーに接続しました");
@@ -66,7 +67,7 @@ public class Channel extends Thread {
 						send("duplicate");
 					} else {
 						send("correct");
-						if (!server.registeList.contains(name)) { // 同時に登録している時に重複しないようにリストで名前を保存
+						if (!server.registeList.contains(name)) { // 登録中の人のリストに名前を追加
 						server.registeList.add(name);
 						}
 						break;
@@ -83,7 +84,7 @@ public class Channel extends Thread {
 			server.showStats(id);
 			int opponentId = server.findOpponent(id);
 			String opponentName = server.getNameById(opponentId);
-			Thread.sleep(1000);
+			Thread.sleep(500);
 			server.removeWaitingPlayer(id);
 			send("対戦相手が見つかりました\n" +
 					"対戦相手は" + opponentName + "です");

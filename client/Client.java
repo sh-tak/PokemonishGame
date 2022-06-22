@@ -19,6 +19,7 @@ public class Client {
     private static final int LOSE = 6;
     private int state;
 
+    // クライアント生成？時にユーザ入力を定義する。(標準入力とか)
     Client(BufferedReader userIn) {
         this.userIn = userIn;
         try{
@@ -34,19 +35,20 @@ public class Client {
     /*
      * 送受信、ログ、　入力関連の設定
      */
-    public void logging(Object s) {
+    public void logging(Object s) { // GUIではSystem.outから変更が必要
         System.out.println(s);
     }
 
-    public String read() throws IOException {
+    public String read() throws IOException { // 定義したユーザ入力から入力を読む
         return userIn.readLine();
     }
 
-    public String receive() throws IOException {
+    public String receive() throws IOException { 
         return in.readLine();
     }
 
-    public void receiveAndLog(int line) throws IOException {
+    // 行数(line)分受け取ってユーザ出力に出力
+    public void receiveAndLog(int line) throws IOException { 
         for (int i = 0; i < line; i++) {
             logging(receive());
         }
@@ -115,7 +117,7 @@ public class Client {
         }
     }
 
-    // 4種類のinputType : move, type, name, password, stats
+    // 5種類のinputType(入力の種類) : move, type, name, password, stats
     public String input(String InputType) throws IOException {
         while (userIn.ready()) { // 相手のターン中の入力を捨てる。StackOverFlow
             read();
@@ -139,7 +141,7 @@ public class Client {
         }
         if(InputType.equals("status")){
             String s = read();
-            while (!isValidTypeInput(s)) {
+            while (!isValidStatsInput(s)) {
                 logging("1: hp, 2: 攻撃, 3: 防御, 4: 特攻, 5: 特防 6:素早さ");
                 logging("1~6の数字を入力してください");
                 s = read();

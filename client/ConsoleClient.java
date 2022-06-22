@@ -15,7 +15,7 @@ public class ConsoleClient {
             // ユーザー入力を標準入力に設定。サーバーと接続
             Client client = new Client(new BufferedReader(
                     new InputStreamReader(System.in)));
-            client.receiveAndLog(1); // 接続確認応答を受け取る
+            client.receiveAndLog(1); // 接続確認(サーバーに接続しました)を受け取る
             client.logging("新しく始めますか?(Yes/No)");
             boolean isNewAccount = client.yesNoInput();
             client.send(isNewAccount ? "new" : "login");
@@ -131,12 +131,12 @@ public class ConsoleClient {
                 client.send("LOSE");
             }else if(client.getState() == WIN){
                 client.send("WIN");
-                client.receiveAndLog(10);
+                client.receiveAndLog(10); // ステータスの表示
                 client.logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
                 client.logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御　4:特攻 5:特防 6:素早さ");
                 String status = client.input("status");
                 client.send(status);
-                client.receiveAndLog(1 + 10);
+                client.receiveAndLog(1 + 10); // 強化したステータス(1)とステータス全体の表示
             }
         } catch (IOException e) {
             e.printStackTrace();
