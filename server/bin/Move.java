@@ -11,14 +11,16 @@ public class Move {
     public int count;
     public int typeValue;
     public boolean isPhysical;
+    public int hitRate;         //命中率
 
-    public Move(String name, int damage, int maxcount, int typeValue, boolean isPhysical) {
+    public Move(String name, int damage, int maxcount, int typeValue, boolean isPhysical, int hitRate) {
         this.name = name;
         this.damage = damage;
         this.maxcount = maxcount;
         this.count = maxcount;
         this.typeValue = typeValue;
         this.isPhysical = isPhysical;
+        this.hitRate = hitRate;          //命中率
     }
 
     @Override
@@ -47,9 +49,9 @@ public class Move {
             s2 = "特殊";
         }
         return ("技名: " + this.name + " 威力: " + this.damage + 
-                " 最大使用可能回数: " + this.count + " 属性: " + s1 + " 技種類: " + s2 +"\n");
+                " 最大使用可能回数: " + this.count + " 属性: " + s1 + " 技種類: " + s2 + "命中率" + this.hitRate　+　"\n");
     }
-
+　
     public double calculateMultiplier(Monster myMonster, Monster oppMonster) {
         double same = 1.0; // タイプ一致
         double con = 1.0; // タイプ相性
