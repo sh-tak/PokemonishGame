@@ -44,6 +44,7 @@ public class ClientInfo{
         for(int i = 0; i < monster.moves.length; i++){
             monster.moves[i].reset();
         }
+        online = false;
     }
 
     public void send(String message) {

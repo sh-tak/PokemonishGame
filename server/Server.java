@@ -77,7 +77,7 @@ public class Server extends Thread {
      * 確認関連
      */
     // 名前が重複していたらtrueを返す
-    public boolean isDuplicateName(String name) {
+    public boolean isDuplicationName(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
                 return true;
@@ -104,7 +104,9 @@ public class Server extends Thread {
     public boolean isValidAccount(String name, String password) throws NoSuchAlgorithmException {
         byte[] hashedPassword = ClientInfo.getHashedPass(password);
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
+            if (clientsInfo[i] != null && 
+                clientsInfo[i].name.equals(name) &&
+                !clientsInfo[i].online) {
                 byte[] storedPassword = clientsInfo[i].getPassward();
                 if(storedPassword.length != hashedPassword.length){
                     return false;

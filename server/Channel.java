@@ -63,7 +63,7 @@ public class Channel extends Thread {
 				String name, password, monsterType;
 				while (true) {
 					name = receive();
-					if (server.isDuplicateName(name)) {
+					if (server.isDuplicationName(name)) {
 						send("duplicate");
 					} else {
 						send("correct");
