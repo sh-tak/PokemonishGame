@@ -177,13 +177,14 @@ public class Server extends Thread {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] moveInfo = line.split(",");
-                    if (moveInfo.length > 4) {
+                    if (moveInfo.length > 5) {
                         moves.add(new Move(
                                 moveInfo[0],
                                 Integer.parseInt(moveInfo[1]),
                                 Integer.parseInt(moveInfo[2]),
                                 Integer.parseInt(moveInfo[3]),
-                                moveInfo[4].equals("1") ? true : false));
+                                moveInfo[4].equals("1") ? true : false,
+                                Integer.parseInt(moveInfo[5])));    //命中率追加
                         i++;
                     }
                 }
@@ -299,6 +300,15 @@ public class Server extends Thread {
             clientsInfo[myId].send(result);
             clientsInfo[opponentId].send(result);
             return;
+        } else if((100-myMove.hitRate) > Math.random()*100){            //技が命中しなかった場合
+            clientsInfo[myId].monster.moves[moveIdx].count--;           //命中しなくてもPP減らす
+            result = partition + "\n" +
+                    myName + "は" +
+                    myMove.name + "を使用した!\n" +
+                    "しかし" +
+                    opponentName + "には当たらなかった!\n" +partition + "\n";
+            clientsInfo[myId].send(result);
+            clientsInfo[opponentId].send(result);
         } else {
             String compatibility;
             double multiplier = myMove.calculateMultiplier(clientsInfo[myId].monster,
