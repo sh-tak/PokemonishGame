@@ -166,7 +166,7 @@ public class ClientUI extends JFrame {
     }
 
     public void logging(String log) {
-        this.logArea.append(log);
+        this.logArea.append(log + "\n");
     }
 
     public void clearLog() {
@@ -181,4 +181,31 @@ public class ClientUI extends JFrame {
         this.enemyHPlabel.setText(status);
     }
 
+    // Stringの入力を返す
+    public String inputStr(String question) {
+        String ans = null;
+        while (ans == null) {
+            ans = JOptionPane.showInputDialog(this, question, "Input", 
+                JOptionPane.QUESTION_MESSAGE);
+        }
+        return ans;
+    }
+
+    // 選択肢の番号を返す
+    public int inputOption(String question, String[] options) {
+        // JOptionPane.showInputDialog(this, "msg", null, JOptionPane.ERROR_MESSAGE,
+        //     null, options, null);
+        int ans = JOptionPane.showOptionDialog(this, question, 
+            "Option dialog", JOptionPane.OK_OPTION, 
+            JOptionPane.INFORMATION_MESSAGE, null, options, null);
+        return ans;
+    }
+
+    // yes:0 no:1を返す
+    public boolean inputYesNo(String question) {
+        int ans = JOptionPane.showConfirmDialog(this, question, "Yes or No", 
+            JOptionPane.YES_NO_OPTION);
+        if (ans == JOptionPane.YES_OPTION) return true;
+        else return false;
+    }
 }
