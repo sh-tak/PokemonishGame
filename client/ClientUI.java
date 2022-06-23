@@ -197,7 +197,7 @@ public class ClientUI extends JFrame {
         //     null, options, null);
         int ans = JOptionPane.showOptionDialog(this, question, 
             "Option dialog", JOptionPane.OK_OPTION, 
-            JOptionPane.INFORMATION_MESSAGE, null, options, null);
+            JOptionPane.QUESTION_MESSAGE, null, options, null);
         return ans;
     }
 
@@ -207,5 +207,9 @@ public class ClientUI extends JFrame {
             JOptionPane.YES_NO_OPTION);
         if (ans == JOptionPane.YES_OPTION) return true;
         else return false;
+    }
+
+    public void warning(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Warning", JOptionPane.WARNING_MESSAGE);
     }
 }
