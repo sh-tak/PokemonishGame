@@ -1,31 +1,31 @@
 package client;
+
 import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class ClientUI extends JFrame{
-    
-    static final int PROGRESSBARHIGHT = 15, PROGRESSBARWIDTH =145;
-    JLabel backgroundImage,alliesImage, enemyImage;//背景画像，味方の画像，敵の画像
-    JLabel alliesHPlabel, alliesHP, enemyHPlabel, enemyHP;//味方の「HP」の表示，味方のXX/YYの表示，以下敵の
-    JLabel alliesName, enemyName;//モンスターの名前
-    JLabel aliiesSquare, enemySquare;//ステータス表示の背景
-    JProgressBar alliesHPbar, enemyHPbar;//HPバー
+public class ClientUI extends JFrame {
+
+    static final int PROGRESSBARHIGHT = 15, PROGRESSBARWIDTH = 145;
+    JLabel backgroundImage, alliesImage, enemyImage;// 背景画像，味方の画像，敵の画像
+    JLabel alliesHPlabel, alliesHP, enemyHPlabel, enemyHP;// 味方の「HP」の表示，味方のXX/YYの表示，以下敵の
+    JLabel alliesName, enemyName;// モンスターの名前
+    JLabel aliiesSquare, enemySquare;// ステータス表示の背景
+    JProgressBar alliesHPbar, enemyHPbar;// HPバー
     JList<String> Movelist;
     JButton okButton;
     JTextArea logArea;
 
-    public ClientUI(){
+    public ClientUI() {
         setTitle("Pokemonish Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(450, 50, 812, 835);
         getContentPane().setLayout(null);
-        
+
         backgroundImage = new JLabel("no image");
         backgroundImage.setBounds(0, 0, 800, 600);
-
 
         alliesImage = new JLabel("no image");
         alliesImage.setBounds(180, 420, 100, 100);
@@ -40,28 +40,28 @@ public class ClientUI extends JFrame{
         alliesHPbar.setBorderPainted(false);
         alliesName = new JLabel("allies");
         alliesName.setBounds(453, 445, 200, 20);
-        alliesName.setFont(new Font(Font.DIALOG,Font.BOLD,20));
+        alliesName.setFont(new Font(Font.DIALOG, Font.BOLD, 20));
         aliiesSquare = new JLabel("");
         aliiesSquare.setBounds(450, 445, 200, 60);
         aliiesSquare.setOpaque(true);
         aliiesSquare.setBackground(Color.WHITE);
-        aliiesSquare.setBorder(new LineBorder(Color.GRAY, 2,false));
-    
-        String[] initialList = {"Move1", "Move2", "Move3", "Move4"};
+        aliiesSquare.setBorder(new LineBorder(Color.GRAY, 2, false));
+
+        String[] initialList = { "Move1", "Move2", "Move3", "Move4" };
         Movelist = new JList<>(initialList);
-        Movelist.setBounds(500,600,300,135);
-        Movelist.setFont(new Font(Font.DIALOG,Font.BOLD,22));
-        Movelist.setBorder(new LineBorder(Color.ORANGE,3,false));
-        
+        Movelist.setBounds(500, 600, 300, 135);
+        Movelist.setFont(new Font(Font.DIALOG, Font.BOLD, 22));
+        Movelist.setBorder(new LineBorder(Color.ORANGE, 3, false));
+
         okButton = new JButton("OK");
         okButton.setBounds(500, 735, 300, 65);
-        okButton.setBorder(new LineBorder(new Color(160,200,255),3,false));
-        //okButton.setBorderPainted(false);
-        
+        okButton.setBorder(new LineBorder(new Color(160, 200, 255), 3, false));
+        // okButton.setBorderPainted(false);
+
         logArea = new JTextArea("log start...\n", 5, 20);
         logArea.setBounds(0, 600, 500, 200);
-        logArea.setBorder(new LineBorder(Color.GRAY, 4,false));
-        
+        logArea.setBorder(new LineBorder(Color.GRAY, 4, false));
+
         enemyImage = new JLabel("no image enemy");
         enemyImage.setBounds(540, 140, 100, 100);
         enemyHP = new JLabel("100/100");
@@ -75,44 +75,42 @@ public class ClientUI extends JFrame{
         enemyHPbar.setBorderPainted(false);
         enemyName = new JLabel("enemy");
         enemyName.setBounds(223, 175, 200, 20);
-        enemyName.setFont(new Font(Font.DIALOG,Font.BOLD,20));
+        enemyName.setFont(new Font(Font.DIALOG, Font.BOLD, 20));
         enemySquare = new JLabel("");
         enemySquare.setBounds(220, 175, 200, 60);
         enemySquare.setOpaque(true);
         enemySquare.setBackground(Color.WHITE);
-        enemySquare.setBorder(new LineBorder(Color.GRAY, 2,false));
-    
+        enemySquare.setBorder(new LineBorder(Color.GRAY, 2, false));
 
-        
-        //TODO: set size of each component
-        
+        // TODO: set size of each component
+
         getContentPane().add(alliesImage);
         getContentPane().add(alliesHPlabel);
         getContentPane().add(alliesHPbar);
         getContentPane().add(alliesHP);
         getContentPane().add(alliesName);
         getContentPane().add(aliiesSquare);
-        
+
         getContentPane().add(logArea);
         getContentPane().add(Movelist);
         getContentPane().add(okButton);
-        
+
         getContentPane().add(enemyImage);
         getContentPane().add(enemyHPlabel);
         getContentPane().add(enemyHPbar);
         getContentPane().add(enemyHP);
         getContentPane().add(enemyName);
         getContentPane().add(enemySquare);
-        
+
         getContentPane().add(backgroundImage);
         setVisible(true);
     }
 
-    public void setHP(int sw, int hp,int max){//HP操作
+    public void setHP(int sw, int hp, int max) {// HP操作
         JProgressBar bar = null;
         JLabel label = null;
-        switch (sw){
-            case 0://味方
+        switch (sw) {
+            case 0:// 味方
                 bar = this.alliesHPbar;
                 label = this.alliesHP;
                 break;
@@ -123,29 +121,30 @@ public class ClientUI extends JFrame{
         }
 
         int value = hp * 100 / max;
-        if (hp <= 0) value = 0;
-        if (value > 50){
+        if (hp <= 0)
+            value = 0;
+        if (value > 50) {
             bar.setForeground(Color.GREEN);
-        }else if(value > 20){
+        } else if (value > 20) {
             bar.setForeground(Color.YELLOW);
-        }else{
+        } else {
             bar.setForeground(Color.RED);
         }
-        
+
         bar.setValue(value);
-        label.setText(hp+"/"+max);
+        label.setText(hp + "/" + max);
     }
 
-    public void setImage(int sw,String file) {//画像操作
+    public void setImage(int sw, String file) {// 画像操作
         JLabel label = null;
-        switch (sw){
-            case -1://背景
+        switch (sw) {
+            case -1:// 背景
                 label = this.backgroundImage;
                 break;
-            case 0://味方
+            case 0:// 味方
                 label = this.alliesImage;
                 break;
-            case 1://敵
+            case 1:// 敵
                 label = this.enemyImage;
                 break;
         }
@@ -174,10 +173,12 @@ public class ClientUI extends JFrame{
         this.logArea.setText(null);
     }
 
-    public int getSelectedWaza(){
+    public int getSelectedWaza() {
         return Movelist.getSelectedIndex();
     }
+
     public void setEnemyStatus(String status) {
         this.enemyHPlabel.setText(status);
     }
+
 }
