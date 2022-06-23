@@ -77,7 +77,7 @@ public class Server extends Thread {
      * 確認関連
      */
     // 名前が重複していたらtrueを返す
-    public boolean isDuplicateName(String name) {
+    public boolean isDuplicationName(String name) {
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
             if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
                 return true;
@@ -104,7 +104,9 @@ public class Server extends Thread {
     public boolean isValidAccount(String name, String password) throws NoSuchAlgorithmException {
         byte[] hashedPassword = ClientInfo.getHashedPass(password);
         for (int i = 0; i < MAX_CONNECTIONS; i++) {
-            if (clientsInfo[i] != null && clientsInfo[i].name.equals(name)) {
+            if (clientsInfo[i] != null && 
+                clientsInfo[i].name.equals(name) &&
+                !clientsInfo[i].online) {
                 byte[] storedPassword = clientsInfo[i].getPassward();
                 if(storedPassword.length != hashedPassword.length){
                     return false;
@@ -175,13 +177,14 @@ public class Server extends Thread {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] moveInfo = line.split(",");
-                    if (moveInfo.length > 4) {
+                    if (moveInfo.length > 5) {
                         moves.add(new Move(
                                 moveInfo[0],
                                 Integer.parseInt(moveInfo[1]),
                                 Integer.parseInt(moveInfo[2]),
                                 Integer.parseInt(moveInfo[3]),
-                                moveInfo[4].equals("1") ? true : false));
+                                moveInfo[4].equals("1") ? true : false,
+                                Integer.parseInt(moveInfo[5])));    //命中率追加
                         i++;
                     }
                 }
@@ -297,6 +300,15 @@ public class Server extends Thread {
             clientsInfo[myId].send(result);
             clientsInfo[opponentId].send(result);
             return;
+        } else if((100-myMove.hitRate) > Math.random()*100){            //技が命中しなかった場合
+            clientsInfo[myId].monster.moves[moveIdx].count--;           //命中しなくてもPP減らす
+            result = partition + "\n" +
+                    myName + "は" +
+                    myMove.name + "を使用した!\n" +
+                    "しかし" +
+                    opponentName + "には当たらなかった!\n" +partition + "\n";
+            clientsInfo[myId].send(result);
+            clientsInfo[opponentId].send(result);
         } else {
             String compatibility;
             double multiplier = myMove.calculateMultiplier(clientsInfo[myId].monster,
