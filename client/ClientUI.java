@@ -59,8 +59,9 @@ public class ClientUI extends JFrame {
         // okButton.setBorderPainted(false);
 
         logArea = new JTextArea("log start...\n", 5, 20);
-        logArea.setBounds(0, 600, 500, 200);
-        logArea.setBorder(new LineBorder(Color.GRAY, 4, false));
+        JScrollPane logScroll = new JScrollPane(logArea);
+        logScroll.setBounds(0, 600, 500, 200);
+        logScroll.setBorder(new LineBorder(Color.GRAY, 4, false));
 
         enemyImage = new JLabel("no image enemy");
         enemyImage.setBounds(540, 140, 100, 100);
@@ -91,7 +92,7 @@ public class ClientUI extends JFrame {
         getContentPane().add(alliesName);
         getContentPane().add(aliiesSquare);
 
-        getContentPane().add(logArea);
+        getContentPane().add(logScroll);
         getContentPane().add(Movelist);
         getContentPane().add(okButton);
 
@@ -106,7 +107,8 @@ public class ClientUI extends JFrame {
         setVisible(true);
     }
 
-    public void setHP(int sw, int hp, int max) {// HP操作
+    // HPバー操作味方：sw0, 敵：sw1
+    public void setHP(int sw, int hp, int max) {
         JProgressBar bar = null;
         JLabel label = null;
         switch (sw) {
@@ -157,8 +159,8 @@ public class ClientUI extends JFrame {
         this.alliesHPlabel.setText(newStatus);
     }
 
-    public void setWaza(String[] newWaza) {
-        this.Movelist.setListData(newWaza);
+    public void setMove(String[] newMove) {
+        this.Movelist.setListData(newMove);
     }
 
     public void setButtonAction(ActionListener a) {
@@ -173,7 +175,7 @@ public class ClientUI extends JFrame {
         this.logArea.setText(null);
     }
 
-    public int getSelectedWaza() {
+    public int getSelectedMove() {
         return Movelist.getSelectedIndex();
     }
 
