@@ -21,3 +21,19 @@ GUIの実装ではServer.javaやChannel.java, Client.javaなどを都合のい�
 技の追加(現在16個)
 ダメージの調整
 逆に防御が大きくて攻撃が小さいと全然試合が終わらない。
+
+# 実行方法
+## windows
+`server.bat`を起動してから、`client.bat`を起動する。
+
+## others
+コンパイルして実行
+```
+server/Server.java
+client/ConsoleClient.java
+```
+または
+```
+server/Server.java
+client/GraphicalClient.java
+```
