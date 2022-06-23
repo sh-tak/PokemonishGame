@@ -12,13 +12,14 @@ public class GraphicalClient {
     private static final int WIN = 5;
     private static final int LOSE = 6;
 
-    public static final String[] MONSTER_TYPE = 
-        { "火", "水", "草", "光", "闇"};
-    public static final String[] MONSTER_STATUS =
-        {"hp", "攻撃", "防御", "特攻", "特防", "素早さ"};
+    public static final String[] MONSTER_TYPE = { "火", "水", "草", "光", "闇" };
+    public static final String[] MONSTER_STATUS = { "hp", "攻撃", "防御", "特攻", "特防", "素早さ" };
 
     private static ClientUI gClient;
     private static Client cClient;
+
+    private static boolean waitMoveSelect = true;
+    private static int selectedMoveIndex = -1;
 
     private static void logging(String str) {
         gClient.logging(str);
@@ -28,19 +29,19 @@ public class GraphicalClient {
         gClient.warning(msg);
     }
 
-    private static String input(String question){
+    private static String input(String question) {
         return gClient.inputStr(question);
     }
 
-    private static int optionInput(String question, String[] options){
+    private static int optionInput(String question, String[] options) {
         return gClient.inputOption(question, options);
     }
 
-    private static boolean yesNoInput(String question){
+    private static boolean yesNoInput(String question) {
         return gClient.inputYesNo(question);
     }
 
-    private static String[] receiveAndLog(int line) throws IOException{
+    private static String[] receiveAndLog(int line) throws IOException {
         String[] result = new String[line];
         for (int i = 0; i < line; i++) {
             result[i] = cClient.receive();
@@ -54,18 +55,22 @@ public class GraphicalClient {
         gClient = new ClientUI();
         gClient.setStatus("HP");
         String[] testWaza = { "waza1", "waza2", "waza3", "waza4" };
-        gClient.setWaza(testWaza);
+        gClient.setMove(testWaza);
         gClient.setImage(-1, "client/image/background.png");
         gClient.setImage(0, "client/image/a.png");
-        gClient.setHP(0, 160, 250);
+        gClient.setHP(0, 10, 10);
         gClient.setButtonAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, gClient.getSelectedWaza());
+                selectedMoveIndex = gClient.getSelectedMove();
+                if (selectedMoveIndex != -1) {
+                    waitMoveSelect = false;
+                    JOptionPane.showMessageDialog(null, gClient.getSelectedMove());
+                }
             }
         });
         gClient.clearLog();
 
-        gClient.setHP(1, 10, 140);
+        gClient.setHP(1, 10, 10);
         gClient.setImage(1, "client/image/a.png");
 
         try {
@@ -91,7 +96,7 @@ public class GraphicalClient {
                     } else {
                         warning("名前またはパスワードが間違っています\n");
                         if (yesNoInput(
-                            "もう一度入力しますか?(Yes) 新規登録しますか?(No)")) {
+                                "もう一度入力しますか?(Yes) 新規登録しますか?(No)")) {
                             cClient.send("onemore");
                             continue;
                         } else {
@@ -129,14 +134,16 @@ public class GraphicalClient {
                                 "1から入力し直してください");
                     }
                 }
-                int typeIndex = optionInput("モンスターの属性を選択してください", 
-                    MONSTER_TYPE);
+                int typeIndex = optionInput("モンスターの属性を選択してください",
+                        MONSTER_TYPE);
                 logging("属性：" + MONSTER_TYPE[typeIndex]);
                 // String monsterType = cClient.input("type");
-                cClient.send(Integer.toString(typeIndex+1));
+                cClient.send(Integer.toString(typeIndex + 1));
             }
 
-            receiveAndLog(10);// モンスター情報を受け取る
+            String[] myStatus = receiveAndLog(10);// モンスター情報を受け取る
+            int myMaxHp = Integer.parseInt(myStatus[2].replaceAll("[^\\d]", ""));
+            gClient.setHP(0, myMaxHp, myMaxHp);
             logging("対戦相手を探しています");
             receiveAndLog(2); // 対戦相手を表示
 
@@ -153,12 +160,28 @@ public class GraphicalClient {
             logging("対戦を開始します");
             while (cClient.getState() != WIN && cClient.getState() != LOSE) {
                 if (cClient.getState() == MY_TURN) {
-                    String moveIndex;
                     logging("あなたのターンです");
                     cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
-                    receiveAndLog(10);// 技の表示
-                    moveIndex = cClient.input("move");
-                    cClient.send(Integer.toString(Integer.parseInt(moveIndex) - 1));
+                    String[] moveReceive = receiveAndLog(10);// 技の表示
+                    String[] myMove = new String[4];
+                    myMove[0] = moveReceive[1];
+                    myMove[1] = moveReceive[3];
+                    myMove[2] = moveReceive[5];
+                    myMove[3] = moveReceive[7];
+                    gClient.setMove(myMove);
+
+                    waitMoveSelect = true;
+
+                    while(waitMoveSelect){
+                        try{
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            warning("sleep interrupted in wait move select");
+                        }
+                    }
+                    // int moveIndex = optionInput("技を選択してください", myMove);
+                    cClient.send(Integer.toString(selectedMoveIndex));
+
                     receiveAndLog(5 + 3);// 技の結果とHP表示
                     if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
                         cClient.setState(WIN);
@@ -192,7 +215,7 @@ public class GraphicalClient {
                 receiveAndLog(10);
                 logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
                 logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
-                String status = cClient.input("status");
+                String status = input("status");
                 cClient.send(status);
                 receiveAndLog(1 + 10);
             }
