@@ -40,6 +40,15 @@ public class GraphicalClient {
         return gClient.inputYesNo(question);
     }
 
+    private static String[] receiveAndLog(int line) throws IOException{
+        String[] result = new String[line];
+        for (int i = 0; i < line; i++) {
+            result[i] = cClient.receive();
+            logging(result[i]);
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         // initialize gui
         gClient = new ClientUI();
@@ -63,7 +72,7 @@ public class GraphicalClient {
             // ユーザー入力を標準入力に設定。サーバーと接続
             cClient = new Client(new BufferedReader(
                     new InputStreamReader(System.in)));
-            cClient.receiveAndLog(1); // 接続確認応答を受け取る
+            receiveAndLog(1); // 接続確認応答を受け取る
             // logging("新しく始めますか?(Yes/No)");
             boolean isNewAccount = yesNoInput("新しく始めますか?");
             cClient.send(isNewAccount ? "new" : "login");
@@ -127,9 +136,9 @@ public class GraphicalClient {
                 cClient.send(Integer.toString(typeIndex+1));
             }
 
-            cClient.receiveAndLog(10);// モンスター情報を受け取る
+            receiveAndLog(10);// モンスター情報を受け取る
             logging("対戦相手を探しています");
-            cClient.receiveAndLog(2); // 対戦相手を表示
+            receiveAndLog(2); // 対戦相手を表示
 
             // 対戦
             if (cClient.receive().equals("first")) {
@@ -147,10 +156,10 @@ public class GraphicalClient {
                     String moveIndex;
                     logging("あなたのターンです");
                     cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
-                    cClient.receiveAndLog(10);// 技の表示
+                    receiveAndLog(10);// 技の表示
                     moveIndex = cClient.input("move");
                     cClient.send(Integer.toString(Integer.parseInt(moveIndex) - 1));
-                    cClient.receiveAndLog(5 + 3);// 技の結果とHP表示
+                    receiveAndLog(5 + 3);// 技の結果とHP表示
                     if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
                         cClient.setState(WIN);
                         break;
@@ -160,7 +169,7 @@ public class GraphicalClient {
                 } else if (cClient.getState() == OPPONENT_TURN) {
                     logging("相手のターンです");
                     cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
-                    cClient.receiveAndLog(5 + 3);// 技の結果とHP表示
+                    receiveAndLog(5 + 3);// 技の結果とHP表示
                     cClient.send("resultreceived"); // 技の結果の受け取りを報告
                     if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
                         cClient.setState(LOSE);
@@ -180,12 +189,12 @@ public class GraphicalClient {
                 cClient.send("LOSE");
             } else if (cClient.getState() == WIN) {
                 cClient.send("WIN");
-                cClient.receiveAndLog(10);
+                receiveAndLog(10);
                 logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
                 logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
                 String status = cClient.input("status");
                 cClient.send(status);
-                cClient.receiveAndLog(1 + 10);
+                receiveAndLog(1 + 10);
             }
         } catch (IOException e) {
             e.printStackTrace();
