@@ -12,11 +12,32 @@ public class GraphicalClient {
     private static final int WIN = 5;
     private static final int LOSE = 6;
 
+    public static final String[] MONSTER_TYPE = 
+        { "火", "水", "草", "光", "闇"};
+    public static final String[] MONSTER_STATUS =
+        {"hp", "攻撃", "防御", "特攻", "特防", "素早さ"};
+
     private static ClientUI gClient;
     private static Client cClient;
 
     private static void logging(String str) {
-        gClient.logging(str + "\n");
+        gClient.logging(str);
+    }
+
+    private static void warning(String msg) {
+        gClient.warning(msg);
+    }
+
+    private static String input(String question){
+        return gClient.inputStr(question);
+    }
+
+    private static int optionInput(String question, String[] options){
+        return gClient.inputOption(question, options);
+    }
+
+    private static boolean yesNoInput(String question){
+        return gClient.inputYesNo(question);
     }
 
     public static void main(String[] args) {
@@ -43,15 +64,15 @@ public class GraphicalClient {
             cClient = new Client(new BufferedReader(
                     new InputStreamReader(System.in)));
             cClient.receiveAndLog(1); // 接続確認応答を受け取る
-            logging("新しく始めますか?(Yes/No)");
-            boolean isNewAccount = cClient.yesNoInput();
+            // logging("新しく始めますか?(Yes/No)");
+            boolean isNewAccount = yesNoInput("新しく始めますか?");
             cClient.send(isNewAccount ? "new" : "login");
             if (!isNewAccount) {// ログインして始める
                 while (true) {
-                    logging("登録済みの名前を入力してください");
-                    String inname = cClient.input("name");
-                    logging("パスワードを入力してください");
-                    String inpass = cClient.input("pass");
+                    String inname = input("登録済みの名前を入力してください");
+                    logging(inname);
+                    String inpass = input("パスワードを入力してください");
+                    logging(inpass);
                     cClient.send(inname);
                     cClient.send(inpass);
                     String ack = cClient.receive();
@@ -59,9 +80,9 @@ public class GraphicalClient {
                         logging("ログインしました");
                         break;
                     } else {
-                        logging("名前またはパスワードが間違っています\n" +
-                                "もう一度入力しますか?(Yes) 新規登録しますか?(No)");
-                        if (cClient.yesNoInput()) {
+                        warning("名前またはパスワードが間違っています\n");
+                        if (yesNoInput(
+                            "もう一度入力しますか?(Yes) 新規登録しますか?(No)")) {
                             cClient.send("onemore");
                             continue;
                         } else {
@@ -75,34 +96,35 @@ public class GraphicalClient {
             if (isNewAccount) {// 新規登録
                 while (true) {
                     String name;
-                    logging("新規の名前を入力してください");
-                    name = cClient.input("name");
+                    name = input("新規の名前を入力してください");
+                    logging(name);
                     cClient.send(name);
                     if (cClient.receive().equals("duplicate")) {
-                        logging("その名前は使用できません");
+                        warning("その名前は使用できません");
                     } else {
                         break;
                     }
                 }
                 while (true) {
                     String password1, password2;
-                    logging("パスワードを入力してください");
-                    password1 = cClient.input("pass");
-                    logging("パスワードを再度入力してください");
-                    password2 = cClient.input("pass");
+                    password1 = input("パスワードを入力してください");
+                    logging(password1);
+                    password2 = input("パスワードを再度入力してください");
+                    logging(password2);
                     if (password1.equals(password2)) {
                         cClient.send(password1);
                         logging("登録しました");
                         break;
                     } else {
-                        logging("パスワードが一致しません\n" +
+                        warning("パスワードが一致しません\n" +
                                 "1から入力し直してください");
                     }
                 }
-                logging("モンスターの属性を選択してください\n" +
-                        "1: 火 2: 水 3: 草  4: 光  5: 闇");
-                String monsterType = cClient.input("type");
-                cClient.send(monsterType);
+                int typeIndex = optionInput("モンスターの属性を選択してください", 
+                    MONSTER_TYPE);
+                logging("属性：" + MONSTER_TYPE[typeIndex]);
+                // String monsterType = cClient.input("type");
+                cClient.send(Integer.toString(typeIndex+1));
             }
 
             cClient.receiveAndLog(10);// モンスター情報を受け取る
