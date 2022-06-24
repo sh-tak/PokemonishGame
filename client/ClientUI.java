@@ -49,19 +49,22 @@ public class ClientUI extends JFrame {
 
         String[] initialList = { "Move1", "Move2", "Move3", "Move4" };
         Movelist = new JList<>(initialList);
-        Movelist.setBounds(500, 600, 300, 135);
-        Movelist.setFont(new Font(Font.DIALOG, Font.BOLD, 22));
+        Movelist.setBounds(0, 705, 705, 95);
+        Movelist.setFont(new Font(Font.DIALOG, Font.PLAIN, 15));
         Movelist.setBorder(new LineBorder(Color.ORANGE, 3, false));
+        //2行にするなら
+        //Movelist.setVisibleRowCount(2);
+        //Movelist.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        
 
         okButton = new JButton("OK");
-        okButton.setBounds(500, 735, 300, 65);
+        okButton.setBounds(705, 705, 95, 95);
         okButton.setBorder(new LineBorder(new Color(160, 200, 255), 3, false));
-        // okButton.setBorderPainted(false);
 
         logArea = new JTextArea("log start...\n", 5, 20);
         JScrollPane logScroll = new JScrollPane(logArea);
-        logScroll.setBounds(0, 600, 500, 200);
-        logScroll.setBorder(new LineBorder(Color.GRAY, 4, false));
+        logScroll.setBounds(0, 600, 800, 105);
+        logScroll.setBorder(new LineBorder(Color.GRAY, 3, false));
 
         enemyImage = new JLabel("no image enemy");
         enemyImage.setBounds(540, 140, 100, 100);
