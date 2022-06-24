@@ -147,6 +147,10 @@ public class GraphicalClient {
             logging("対戦相手を探しています");
             receiveAndLog(2); // 対戦相手を表示
 
+            // 対戦相手が決まったらHPを受信する?
+            // int myMaxHp = Integer.parseInt(cClient.receive());
+            // int opponentMaxHp = Integer.parseInt(cClient.receive());
+
             // 対戦
             if (cClient.receive().equals("first")) {
                 logging("あなたが先攻です");
@@ -155,6 +159,7 @@ public class GraphicalClient {
                 logging("あなたが後攻です");
                 cClient.setState(OPPONENT_TURN);
             }
+
 
             // 対戦開始
             logging("対戦を開始します");

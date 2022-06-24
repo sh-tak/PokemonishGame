@@ -238,6 +238,12 @@ public class Server extends Thread {
         }
     }
 
+    // 対戦前に自分と敵のHPを送信する
+    public void sendHp(int myId, int opponentId){
+        clientsInfo[myId].send(Integer.toString(clientsInfo[myId].monster.maxHp));
+        clientsInfo[myId].send(Integer.toString(clientsInfo[opponentId].monster.maxHp));
+    }
+
     // ステータスを選んで3上げる
     public void levelUp(int id, int status){
         if(status == 1){

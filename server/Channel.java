@@ -91,6 +91,9 @@ public class Channel extends Thread {
 			send(server.isFirstTurn(id, opponentId) ? "first" : "second");
 
 			// 対戦開始
+			// 対戦前にHP送信
+			// server.sendHp(id, opponentId);
+
 			while (true) {
 				String clientState = receive();
 				if (clientState.equals(MY_TURN)) {
