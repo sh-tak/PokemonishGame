@@ -188,6 +188,7 @@ public class GraphicalClient {
                     cClient.send(Integer.toString(selectedMoveIndex));
 
                     receiveAndLog(5 + 3);// 技の結果とHP表示
+                    gClient.setHP(1, Integer.parseInt(cClient.receive()), opponentMaxHp); // 敵のHP更新
                     if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
                         cClient.setState(WIN);
                         break;
@@ -198,6 +199,7 @@ public class GraphicalClient {
                     logging("相手のターンです");
                     cClient.send(Integer.toString(cClient.getState()));// 先に状態を送る
                     receiveAndLog(5 + 3);// 技の結果とHP表示
+                    gClient.setHP(0, Integer.parseInt(cClient.receive()), myMaxHp); // 自分のHP更新
                     cClient.send("resultreceived"); // 技の結果の受け取りを報告
                     if (cClient.receive().equals("gameisover")) { // ゲーム終了判定
                         cClient.setState(LOSE);

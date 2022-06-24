@@ -102,6 +102,8 @@ public class Channel extends Thread {
 					int moveIndex = Integer.parseInt(receive());
 					server.useMove(id, opponentId, moveIndex);
 					server.showCurrentHp(id, opponentId);
+					server.sendHp(id, opponentId);
+					server.sendHp(opponentId, opponentId);
 					if (server.isGameover(id, opponentId)) {
 						send("gameisover");
 						break;
@@ -110,7 +112,7 @@ public class Channel extends Thread {
 					}
 				} else if (clientState.equals(OPPONENT_TURN)) {
 					// 攻撃側の呼び出しで技の結果, HPを表示
-					receive(); // 技の結果の受け取り確認
+					receive(); // 技の結果の受け取り、HPの受け取り確認
 					if (server.isGameover(id, opponentId)) {
 						send("gameisover");
 						break;

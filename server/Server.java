@@ -240,7 +240,7 @@ public class Server extends Thread {
 
     // 対戦の時にHPを送る
     public void sendHp(int myId, int idForHp){
-        clientsInfo[myId].send(Integer.toString(clientsInfo[idForHp].monster.maxHp));
+        clientsInfo[myId].send(Integer.toString(clientsInfo[idForHp].monster.hp));
     }
 
     // ステータスを選んで3上げる
