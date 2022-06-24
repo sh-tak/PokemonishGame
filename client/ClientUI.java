@@ -172,6 +172,7 @@ public class ClientUI extends JFrame {
 
     public void logging(String log) {
         this.logArea.append(log + "\n");
+        this.logArea.setCaretPosition(this.logArea.getText().length());
     }
 
     public void clearLog() {
