@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -173,7 +174,7 @@ public class Server extends Thread {
         int i = 0;
         try {
             ArrayList<Move> moves = new ArrayList<Move>();
-            try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] moveInfo = line.split(",");
