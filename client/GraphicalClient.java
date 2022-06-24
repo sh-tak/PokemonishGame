@@ -64,7 +64,7 @@ public class GraphicalClient {
                 selectedMoveIndex = gClient.getSelectedMove();
                 if (selectedMoveIndex != -1) {
                     waitMoveSelect = false;
-                    JOptionPane.showMessageDialog(null, gClient.getSelectedMove());
+                    // JOptionPane.showMessageDialog(null, gClient.getSelectedMove());
                 }
             }
         });
