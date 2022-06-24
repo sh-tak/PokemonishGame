@@ -49,9 +49,9 @@ public class Move {
             s2 = "特殊";
         }
         return ("技名: " + this.name + " 威力: " + this.damage + 
-                " 最大使用可能回数: " + this.count + " 属性: " + s1 + " 技種類: " + s2 + "命中率" + this.hitRate　+　"\n");
+                " 最大使用可能回数: " + this.count + " 属性: " + s1 + " 技種類: " + s2 + "命中率" + this.hitRate + "\n");
     }
-　
+
     public double calculateMultiplier(Monster myMonster, Monster oppMonster) {
         double same = 1.0; // タイプ一致
         double con = 1.0; // タイプ相性

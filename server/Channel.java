@@ -92,8 +92,8 @@ public class Channel extends Thread {
 
 			// 対戦開始
 			// 対戦前にHP送信
-			// server.sendHp(id, /* id for hp = */id);
-			// server.sendHp(id, opponentId);
+			server.sendHp(id, /* id for hp = */id);
+			server.sendHp(id, opponentId);
 
 			while (true) {
 				String clientState = receive();

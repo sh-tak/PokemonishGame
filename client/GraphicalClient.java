@@ -141,15 +141,10 @@ public class GraphicalClient {
                 cClient.send(Integer.toString(typeIndex + 1));
             }
 
-            String[] myStatus = receiveAndLog(10);// モンスター情報を受け取る
-            int myMaxHp = Integer.parseInt(myStatus[2].replaceAll("[^\\d]", ""));
-            gClient.setHP(0, myMaxHp, myMaxHp);
+            receiveAndLog(10);// モンスター情報を受け取る
             logging("対戦相手を探しています");
             receiveAndLog(2); // 対戦相手を表示
-
-            // 対戦相手が決まったらHPを受信する?
-            // int myMaxHp = Integer.parseInt(cClient.receive());
-            // int opponentMaxHp = Integer.parseInt(cClient.receive());
+            
 
             // 対戦
             if (cClient.receive().equals("first")) {
@@ -160,6 +155,11 @@ public class GraphicalClient {
                 cClient.setState(OPPONENT_TURN);
             }
 
+            // 対戦相手が決まったらHPを受信する?
+            int myMaxHp = Integer.parseInt(cClient.receive());
+            int opponentMaxHp = Integer.parseInt(cClient.receive());
+            gClient.setHP(0, myMaxHp, myMaxHp);
+            gClient.setHP(1, opponentMaxHp, opponentMaxHp);
 
             // 対戦開始
             logging("対戦を開始します");
