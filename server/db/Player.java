@@ -3,7 +3,7 @@ package server.db;
 import java.util.Random;
 
 public class Player {
-    int id;
+    int id; //not used
     String name;
     String pw;
 
@@ -36,5 +36,11 @@ public class Player {
 
     public static void resetCount() {
         count = 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "{id:%d, name:\"%s\", pw:\"%s\"}", this.id, this.name, this.pw);
     }
 }
