@@ -30,7 +30,9 @@ public class PwManager {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(SQL_URL, SQL_USER, SQL_PW);
             this.statement = connection.createStatement();
+            System.out.println("Database connected");
         } catch (Exception e) {
+            System.out.println("Database connection error");
             e.printStackTrace();
         }
     }
@@ -49,19 +51,19 @@ public class PwManager {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("SQL error");
+            System.err.println("cannot reload players");
             e.printStackTrace();
             return false;
         }
     }
 
     public boolean addPlayer(String name, String pw) {
-        String sql = "INSERT INTO pockemonishgame.players(name, pw) VALUES(%s, %s);";
+        String sql = "INSERT INTO players (name, pw) VALUES('%s', '%s');";
         sql = String.format(sql, name, pw);
         try {
             statement.executeUpdate(sql);
         } catch (Exception e) {
-            System.err.println("SQL error");
+            System.err.println("cannot add player");
             e.printStackTrace();
             return false;
         }
