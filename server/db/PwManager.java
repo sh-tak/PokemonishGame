@@ -3,6 +3,7 @@ package server.db;
 // import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,7 +12,7 @@ import java.sql.Statement;
 public class PwManager {
     private final String SQL_URL = "jdbc:mysql://localhost:3306/pockemonishgame";
     private final String SQL_USER = "root";
-    private final String SQL_PW = "";
+    private String SQL_PW = "";
 
     // private ArrayList<Player> players = new ArrayList<>();
     private Map<String, String> pwlist = new HashMap<>();
@@ -19,6 +20,12 @@ public class PwManager {
     Statement statement;
 
     public PwManager() {
+        if(SQL_PW.equals("")){
+            Scanner sc = new Scanner(System.in);
+            System.out.println("SQL PW");
+            SQL_PW = sc.next();
+            sc.close();
+        }
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(SQL_URL, SQL_USER, SQL_PW);
