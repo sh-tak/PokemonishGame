@@ -7,21 +7,17 @@ public class Player {
     String name;
     String pw;
 
-    static int idStackTop = 0;
+    static int count = 0;
 
-    // id is not guaranted 
-    // real id is max(preferedId, idStackTop)
-    public Player(int preferedId, String name, String pw) {
-        this.id = Math.max(idStackTop, preferedId);
+    public Player(int id, String name, String pw) {
+        this.id = id;
         this.name = name;
         this.pw = pw;
-        idStackTop = this.id++;
+        count++;
     }
 
     public Player(String name, String pw) {
-        this.id = idStackTop++;
-        this.name = name;
-        this.pw = pw;
+        this(count, name, pw);
     }
 
     // generated at https://randomwordgenerator.com/name.php
@@ -36,5 +32,9 @@ public class Player {
         this(null, pw);
         Random random = new Random();
         this.name = randomNames[random.nextInt(randomNames.length)];
+    }
+
+    public static void resetCount() {
+        count = 0;
     }
 }
