@@ -51,6 +51,9 @@ public class GraphicalClient {
     }
 
     public static void main(String[] args) {
+        // クライアントが強制終了(Ctrl+C)した時に起動するスレッド(サーバー側にSIGINTを送信
+        Runtime.getRuntime().addShutdownHook(
+            new Thread (() -> {cClient.send("SIGINT"); cClient.out = null; cClient.in = null;}));
         // initialize gui
         gClient = new ClientUI();
         gClient.setStatus("HP");
