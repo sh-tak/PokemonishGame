@@ -278,26 +278,26 @@ public class Server extends Thread {
         clientsInfo[myId].send(Integer.toString(clientsInfo[idForHp].monster.hp));
     }
 
-    // ステータスを選んで3上げる
+    // ステータスを選んで3上げる 32が最大
     public void levelUp(int id, int status){
         if(status == 1){
             int val = clientsInfo[id].monster.health.getValue();
-            clientsInfo[id].monster.health.setValue(val + 3);
+            clientsInfo[id].monster.health.setValue(val + 3 < 32 ? val + 3 : 32);
         }else if(status == 2){
             int val = clientsInfo[id].monster.attack.getValue();
-            clientsInfo[id].monster.attack.setValue(val + 3);
+            clientsInfo[id].monster.attack.setValue(val + 3 < 32 ? val + 3 : 32);
         }else if(status == 3){
             int val = clientsInfo[id].monster.block.getValue();
-            clientsInfo[id].monster.block.setValue(val + 3);
+            clientsInfo[id].monster.block.setValue(val + 3 < 32 ? val + 3 : 32);
         }else if(status == 4){
             int val = clientsInfo[id].monster.contact.getValue();
-            clientsInfo[id].monster.contact.setValue(val + 3);
+            clientsInfo[id].monster.contact.setValue(val + 3 < 32 ? val + 3 : 32);
         }else if(status == 5){
             int val = clientsInfo[id].monster.defense.getValue();
-            clientsInfo[id].monster.defense.setValue(val + 3);
+            clientsInfo[id].monster.defense.setValue(val + 3 < 32 ? val + 3 : 32);
         }else if(status == 6){
             int val = clientsInfo[id].monster.speed.getValue();
-            clientsInfo[id].monster.speed.setValue(val + 3);
+            clientsInfo[id].monster.speed.setValue(val + 3 < 32 ? val + 3 : 32);
         }
     }
 

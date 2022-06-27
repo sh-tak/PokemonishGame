@@ -14,7 +14,8 @@ public class Channel extends Thread {
 	Socket socket;
 	BufferedReader in;
 	PrintWriter out;
-	public int id;
+	public int id = -1;
+	public int opponentId = -1; 
 
 	// クライアントの状態。ターンの判定などに使う
 	private final String MY_TURN = "3";
@@ -68,7 +69,7 @@ public class Channel extends Thread {
 					} else {
 						send("correct");
 						if (!server.registeList.contains(name)) { // 登録中の人のリストに名前を追加
-						server.registeList.add(name);
+							server.registeList.add(name);
 						}
 						break;
 					}
@@ -82,7 +83,14 @@ public class Channel extends Thread {
 			}
 
 			server.showStats(id);
-			int opponentId = server.findOpponent(id);
+			server.waitingPlayers.add(id);
+			while(opponentId == -1){
+				if(in.ready()){ //対戦待ちでSIGINTを受信する用
+					receive();
+					}
+				opponentId = server.findOpponent(id);
+				Thread.sleep(100);
+			}
 			String opponentName = server.getNameById(opponentId);
 			Thread.sleep(500);
 			server.removeWaitingPlayer(id);
@@ -126,7 +134,7 @@ public class Channel extends Thread {
 				server.showStats(id);
 				int status = Integer.parseInt(receive());
 				server.levelUp(id, status);
-				send(Monster.val2stats(status) + "が3点上がりました");
+				send(Monster.val2stats(status) + "が強くなりました");
 				server.showStats(id);
 			}
 		} catch (IOException | InterruptedException | NoSuchAlgorithmException e) {
@@ -141,7 +149,12 @@ public class Channel extends Thread {
 	}
 
 	public String receive() throws IOException {
-		return in.readLine();
+		String s = in.readLine();
+		if(s.equals("SIGINT")){
+			System.out.println("クライアント" + id + "が強制終了しました");
+			server.forceLogout(id, opponentId);
+		}
+		return s;
 	}
 
 	public void logging(Object s) {
