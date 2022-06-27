@@ -77,7 +77,7 @@ public class Monster {
         String stats = "";
         switch(value){
             case 1:
-                stats = "health";
+                stats = "hp値";
                 break;
             case 2:
                 stats = "攻撃";
@@ -134,6 +134,23 @@ public class Monster {
     }
 
     public void resetHp() {
+        this.sum = this.health.getValue() + this.attack.getValue() + this.block.getValue() +
+            this.contact.getValue() + this.defense.getValue() + this.speed.getValue();
+        this.maxHp = (this.sum * 2 + this.health.getValue()) + 110;
+        this.hp = this.maxHp;
+    }
+
+    // 強制終了したら罰を課す(負けそうになったら抜けれてしまうから)
+    public void sigintPunish() {
+        this.health.setValue(this.health.getValue() / 2);
+        this.attack.setValue(this.attack.getValue() / 2);
+        this.block.setValue(this.block.getValue() / 2);
+        this.contact.setValue(this.contact.getValue() / 2);
+        this.defense.setValue(this.defense.getValue() / 2);
+        this.speed.setValue(this.speed.getValue() / 2);
+        this.sum = this.health.getValue() + this.attack.getValue() + this.block.getValue() +
+            this.contact.getValue() + this.defense.getValue() + this.speed.getValue();
+        this.maxHp = (this.sum * 2 + this.health.getValue()) + 110;
         this.hp = this.maxHp;
     }
 }

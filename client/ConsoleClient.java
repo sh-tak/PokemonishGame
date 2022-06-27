@@ -78,7 +78,7 @@ public class ConsoleClient {
                 client.send(monsterType);
             }
 
-            client.receiveAndLog(10);// モンスター情報を受け取る
+            client.receiveAndLog(10);// モンスター情報を受け取
             client.logging("対戦相手を探しています");
             client.receiveAndLog(2); // 対戦相手を表示
 

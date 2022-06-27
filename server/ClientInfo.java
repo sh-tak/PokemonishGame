@@ -12,7 +12,7 @@ public class ClientInfo{
     private byte[] hashedPassword;
     public Monster monster;
     private PrintWriter out;
-    boolean online;
+    boolean online = false;
 
     ClientInfo(int id, String name, String plainPassword, Monster monster, PrintWriter out) throws NoSuchAlgorithmException {
         this.id = id;
@@ -40,9 +40,11 @@ public class ClientInfo{
     // 対戦(通信)終了時に呼び出す
     public void logout(){
         out = null;
-        monster.resetHp();
-        for(int i = 0; i < monster.moves.length; i++){
-            monster.moves[i].reset();
+        if(monster != null) {
+            monster.resetHp();
+            for(int i = 0; i < monster.moves.length; i++){
+                monster.moves[i].reset();
+            }
         }
         online = false;
     }

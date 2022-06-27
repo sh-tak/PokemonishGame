@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +20,7 @@ public class Server extends Thread {
     static int MAX_CONNECTIONS = 128;
     private static final int PORT = 8080;
     ServerSocket serverSocket;
-    ClientInfo clientsInfo[] = new ClientInfo[MAX_CONNECTIONS]; // クライアント間で通信するためのメンバ変数
+    ClientInfo clientsInfo[] = new ClientInfo[MAX_CONNECTIONS]; 
     Move[] importedMoves;
     // 対戦待ちの人のリスト
     List<Integer> waitingPlayers = new ArrayList<Integer>();// 対戦待ちリスト
@@ -37,18 +38,25 @@ public class Server extends Thread {
 
     public void run() {
         try {
+            new Thread(() -> {// サーバー起動中にも技を更新したり、クライアントの情報を表示したりできるようにするスレッド
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                while(true){
+                    try {
+                        if(in.ready()){ // 入力があったらその内容に応じて処理(例えば、技を更新する)
+                            String line = in.readLine();
+                            this.debug(line);
+                            }
+                        Thread.sleep(1000);
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
             serverSocket = new ServerSocket(PORT);
             System.out.println("サーバーが起動しました\n");
             importedMoves = fetchMovesFromCsv("./server/bin/moves.csv");
-            // debug用のin server.debug関数を定義するとサーバー側で標準入力して確認に使える
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
-                // 接続待ちの時はsocket.acceptの部分でブロッキングされるのでdebug関数が呼び出されるのは
-                // クライアントが接続された直後
-                if(in.ready()){
-                    String input = in.readLine();
-                    debug(input);
-                }
                 Socket socket = serverSocket.accept();
                 new Channel(socket, this);
             }
@@ -65,11 +73,27 @@ public class Server extends Thread {
         }
     }
 
-    private void debug(String input) {
-        // サーバー側でrenewmoveと打つと技を更新する。
-        //　サーバーを起動した後でも技を追加削除できる
-        if(input.equals("renewmove")){
-            fetchMovesFromCsv("./server/bin/moves.csv");
+    // サーバー側でクライアントの状態を確認したり、技を更新したりする用
+    private  void debug(String line) {
+        if(line.equals("renewmoves")){
+            importedMoves = fetchMovesFromCsv("./server/bin/moves.csv");
+        }else if(line.equals("client")){
+            for(int i = 0; i < clientsInfo.length; i++){
+                if(clientsInfo[i] != null){
+                    System.out.println("id: " + i + " name: " + clientsInfo[i].name + 
+                    (clientsInfo[i].online? " online": " offline"));
+                }
+            }
+        }else if(line.equals("waiting")){
+            System.out.println(waitingPlayers.size() + "人待ち");
+            for(int i = 0; i < waitingPlayers.size(); i++){
+                System.out.println(i + "番目 " + clientsInfo[/*id = */waitingPlayers.get(i)].name);
+            }
+        }else{
+            System.out.println("他の文字列を入力してください");
+            System.out.println("renewmoves: 技を更新 " + 
+                "client: クライアントの一覧を表示 " + 
+                "waiting: 対戦待ちの一覧を表示");
         }
     }
 
@@ -173,7 +197,7 @@ public class Server extends Thread {
         int i = 0;
         try {
             ArrayList<Move> moves = new ArrayList<Move>();
-            try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] moveInfo = line.split(",");
@@ -220,14 +244,11 @@ public class Server extends Thread {
 
     // 相手を探して、相手のidを返す
     public int findOpponent(int id) throws InterruptedException {
-        waitingPlayers.add(id);
-        while (true) {
-            Thread.sleep(100);
-            // 自分の前に対戦待ちが1人以下かつ、自分の後ろか前に対戦待ちがいたらその人と対戦
-            if (waitingPlayers.indexOf(id) < 2 && waitingPlayers.size() > 1) {
-                return waitingPlayers.get(waitingPlayers.indexOf(id) == 1 ? 0 : 1);
-            }
+        // 自分の前に対戦待ちが1人以下かつ、自分の後ろか前に対戦待ちがいたらその人と対戦
+        if (waitingPlayers.indexOf(id) < 2 && waitingPlayers.size() > 1) {
+            return waitingPlayers.get(waitingPlayers.indexOf(id) == 1 ? 0 : 1);
         }
+        return -1;
     }
 
     // 対戦開始前に対戦開始待ちリストから削除する
@@ -236,6 +257,25 @@ public class Server extends Thread {
             waitingPlayers.remove(1);
             waitingPlayers.remove(0);
         }
+    }
+
+    // プレイヤーが強制終了した時に呼び出される
+    public void forceLogout(int id, int opponentId) {
+        if(waitingPlayers.contains(id)) {
+            System.out.println("forceLogout");
+            waitingPlayers.remove(waitingPlayers.indexOf(id));
+        }
+        clientsInfo[id].logout();
+        clientsInfo[id].monster.sigintPunish();
+        if(opponentId != -1){
+            clientsInfo[opponentId].send("相手が強制終了しました");
+            clientsInfo[opponentId].logout();
+        }
+    }
+
+    // 対戦の時にHPを送る
+    public void sendHp(int myId, int idForHp){
+        clientsInfo[myId].send(Integer.toString(clientsInfo[idForHp].monster.hp));
     }
 
     // ステータスを選んで3上げる
