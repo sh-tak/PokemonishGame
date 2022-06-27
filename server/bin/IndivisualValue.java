@@ -12,15 +12,13 @@ public class IndivisualValue {
         this.value = generateValue();
     }
 
-    // 正規分布で値を生成
-    // 一様分布で生成すると極端な値を取りやすくなって試合が一瞬で終わったり、全然終わらなかったりしやすいので正規分布で生成
+    // 最小値10でステータス生成。 10になるのは大体6%
     private int generateValue(){
-        // 平均16, 標準偏差8の値を生成(このとき値が1以下もしくは32以上になる確率は約5%)
-        int gaussianValue = (int) (new Random().nextGaussian()*8 +  16);
+        int gaussianValue = (int) (new Random().nextGaussian()*4 +  16);
         if (gaussianValue > MAX_VALUE) {
             gaussianValue = MAX_VALUE;
-        }else if(gaussianValue < 1){
-            gaussianValue = 1;
+        }else if(gaussianValue < 10){
+            gaussianValue = 10;
         }
         return gaussianValue;    
     }

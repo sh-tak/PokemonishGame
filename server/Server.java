@@ -275,7 +275,9 @@ public class Server extends Thread {
 
     // 対戦の時にHPを送る
     public void sendHp(int myId, int idForHp){
-        clientsInfo[myId].send(Integer.toString(clientsInfo[idForHp].monster.hp));
+        int HP = clientsInfo[idForHp].monster.hp;  
+        if(HP < 0) HP = 0; // HPがマイナスにならないようにする
+        clientsInfo[myId].send(Integer.toString(HP));
     }
 
     // ステータスを選んで3上げる 32が最大

@@ -106,9 +106,9 @@ public class Monster {
     public String toString() {
         String partition = "---------------";
         String evaluation;
-        if(sum > 136){ //上位1％ 
+        if(sum > 130){  
             evaluation = "素晴らしい個体!";
-        } else if(sum > 110){ //上位20％
+        } else if(sum > 105){ 
            evaluation = "相当優秀な個体です。";
         } else if(sum > 93){ //上位50％
            evaluation = "平均以上な個体です。";    
