@@ -3,6 +3,7 @@ package client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Random;
 import java.awt.event.*;
 import javax.swing.*;
 
@@ -20,6 +21,9 @@ public class GraphicalClient {
 
     private static boolean waitMoveSelect = true;
     private static int selectedMoveIndex = -1;
+
+    private static String alliesName = "allies";
+    private static String enemyName = "enemy";
 
     private static void logging(String str) {
         gClient.logging(str);
@@ -90,6 +94,7 @@ public class GraphicalClient {
                     logging(inname);
                     String inpass = input("パスワードを入力してください");
                     logging(inpass);
+                    alliesName = inname;
                     cClient.send(inname);
                     cClient.send(inpass);
                     String ack = cClient.receive();
@@ -110,10 +115,11 @@ public class GraphicalClient {
                     }
                 }
             }
-            if (isNewAccount) {// 新規登録
+            else if (isNewAccount) {// 新規登録
                 while (true) {
                     String name;
                     name = input("新規の名前を入力してください");
+                    alliesName = name;
                     logging(name);
                     cClient.send(name);
                     if (cClient.receive().equals("duplicate")) {
@@ -146,8 +152,18 @@ public class GraphicalClient {
 
             receiveAndLog(10);// モンスター情報を受け取る
             logging("対戦相手を探しています");
-            receiveAndLog(2); // 対戦相手を表示
-            
+            String[] enemyInfo = receiveAndLog(2); // 対戦相手を表示
+            enemyName = enemyInfo[1].substring(5, enemyInfo[1].length()-2);
+
+            // 名前表示
+            gClient.setStatus(alliesName);
+            gClient.setEnemyStatus(enemyName);
+            // 画像表示
+            Random random = new Random();
+            gClient.setImage(0, 
+                String.format("client/image/allies/%d.png", 1+random.nextInt(21)));
+            gClient.setImage(1, 
+                String.format("client/image/enemy/%d.png", 1+random.nextInt(21)));
 
             // 対戦
             if (cClient.receive().equals("first")) {
@@ -215,18 +231,20 @@ public class GraphicalClient {
             // 対戦結果の表示
             if (cClient.getState() == WIN) {
                 logging("あなたの勝ちです");
+                warning("あなたの勝ちです");
             } else if (cClient.getState() == LOSE) {
                 logging("あなたの負けです");
+                warning("あなたの負けです");
             }
             if (cClient.getState() == LOSE) {
                 cClient.send("LOSE");
             } else if (cClient.getState() == WIN) {
                 cClient.send("WIN");
                 receiveAndLog(10);
-                logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
-                logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
-                String status = input("status");
-                cClient.send(status);
+                // logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
+                // logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
+                int status = optionInput("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます", MONSTER_STATUS);
+                cClient.send(Integer.toString(status+1));
                 receiveAndLog(1 + 10);
             }
         } catch (IOException e) {
