@@ -140,6 +140,8 @@ public class ClientUI extends JFrame {
         label.setText(hp + "/" + max);
     }
 
+    // 画像表示
+    // sw: 背景-1, 味方0, 敵1
     public void setImage(int sw, String file) {// 画像操作
         JLabel label = null;
         switch (sw) {
@@ -159,7 +161,7 @@ public class ClientUI extends JFrame {
     }
 
     public void setStatus(String newStatus) {
-        this.alliesHPlabel.setText(newStatus);
+        this.alliesName.setText(newStatus);
     }
 
     public void setMove(String[] newMove) {
@@ -184,7 +186,7 @@ public class ClientUI extends JFrame {
     }
 
     public void setEnemyStatus(String status) {
-        this.enemyHPlabel.setText(status);
+        this.enemyName.setText(status);
     }
 
     // Stringの入力を返す
