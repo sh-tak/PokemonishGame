@@ -81,7 +81,7 @@ public class Channel extends Thread {
 				}
 				id = server.addAccount(name, password, monsterType, this.out);
 			}
-
+			// send(Integer.toString(id)); // id送る
 			server.showStats(id);
 			server.waitingPlayers.add(id);
 			while(opponentId == -1){

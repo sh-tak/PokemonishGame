@@ -143,7 +143,7 @@ public class GraphicalClient {
                 // String monsterType = cClient.input("type");
                 cClient.send(Integer.toString(typeIndex + 1));
             }
-
+            // int id = Integer.parseInt(cClient.receive()); // id受け取る
             receiveAndLog(10);// モンスター情報を受け取る
             logging("対戦相手を探しています");
             receiveAndLog(2); // 対戦相手を表示
