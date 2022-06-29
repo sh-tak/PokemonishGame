@@ -223,10 +223,10 @@ public class GraphicalClient {
             } else if (cClient.getState() == WIN) {
                 cClient.send("WIN");
                 receiveAndLog(10);
-                logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
-                logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
-                String status = input("status");
-                cClient.send(status);
+                // logging("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます");
+                // logging("強化するステータスを選んでください\n1:hp 2:攻撃 3: 防御 4:特攻 5:特防 6:素早さ");
+                int status = optionInput("対戦に勝利したのでモンスターのステータスを1つ選んで強化することができます", MONSTER_STATUS);
+                cClient.send(Integer.toString(status+1));
                 receiveAndLog(1 + 10);
             }
         } catch (IOException e) {
