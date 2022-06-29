@@ -140,6 +140,8 @@ public class ClientUI extends JFrame {
         label.setText(hp + "/" + max);
     }
 
+    // 画像表示
+    // sw: 背景-1, 味方0, 敵1
     public void setImage(int sw, String file) {// 画像操作
         JLabel label = null;
         switch (sw) {
