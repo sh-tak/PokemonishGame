@@ -215,8 +215,10 @@ public class GraphicalClient {
             // 対戦結果の表示
             if (cClient.getState() == WIN) {
                 logging("あなたの勝ちです");
+                warning("あなたの勝ちです");
             } else if (cClient.getState() == LOSE) {
                 logging("あなたの負けです");
+                warning("あなたの負けです");
             }
             if (cClient.getState() == LOSE) {
                 cClient.send("LOSE");
