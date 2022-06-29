@@ -315,7 +315,7 @@ public class Server extends Thread {
         for (int i = 1; i < 5; i++) {
             str += "技" + i + ": " + clientsInfo[id].monster.moves[i-1].toString() + "\n";
         }
-        str += "使いたい技を数字で入力してください";
+        str += "使いたい技を選択してください";
         clientsInfo[id].send(str);
     }
 
