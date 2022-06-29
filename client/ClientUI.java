@@ -161,7 +161,7 @@ public class ClientUI extends JFrame {
     }
 
     public void setStatus(String newStatus) {
-        this.alliesHPlabel.setText(newStatus);
+        this.alliesName.setText(newStatus);
     }
 
     public void setMove(String[] newMove) {
@@ -186,7 +186,7 @@ public class ClientUI extends JFrame {
     }
 
     public void setEnemyStatus(String status) {
-        this.enemyHPlabel.setText(status);
+        this.enemyName.setText(status);
     }
 
     // Stringの入力を返す
