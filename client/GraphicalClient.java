@@ -14,7 +14,7 @@ public class GraphicalClient {
     private static final int LOSE = 6;
 
     public static final String[] MONSTER_TYPE = { "火", "水", "草", "光", "闇" };
-    public static final String[] MONSTER_STATUS = { "hp", "攻撃", "防御", "特攻", "特防", "素早さ" };
+    public static final String[] MONSTER_STATUS = { "HP", "攻撃", "防御", "特攻", "特防", "素早さ" };
 
     private static ClientUI gClient;
     private static Client cClient;
@@ -60,11 +60,10 @@ public class GraphicalClient {
             new Thread (() -> {cClient.send("SIGINT"); cClient.out = null; cClient.in = null;}));
         // initialize gui
         gClient = new ClientUI();
-        gClient.setStatus("HP");
         String[] testWaza = { "waza1", "waza2", "waza3", "waza4" };
         gClient.setMove(testWaza);
         gClient.setImage(-1, "client/image/background.png");
-        gClient.setImage(0, "client/image/a.png");
+        gClient.setImage(0, "client/image/question.png");
         gClient.setHP(0, 10, 10);
         gClient.setButtonAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -78,7 +77,7 @@ public class GraphicalClient {
         gClient.clearLog();
 
         gClient.setHP(1, 10, 10);
-        gClient.setImage(1, "client/image/a.png");
+        gClient.setImage(1, "client/image/question.png");
 
         try {
             // ユーザー入力を標準入力に設定。サーバーと接続
@@ -164,7 +163,8 @@ public class GraphicalClient {
                 String.format("client/image/allies/%d.png", 1+random.nextInt(21)));
             gClient.setImage(1, 
                 String.format("client/image/enemy/%d.png", 1+random.nextInt(21)));
-
+            gClient.setImage(0, "client/image/allies/"+ (Integer.valueOf(cClient.receive())%20)+".png");
+            gClient.setImage(1, "client/image/enemy/"+ (Integer.valueOf(cClient.receive())%20)+".png");            
             // 対戦
             if (cClient.receive().equals("first")) {
                 logging("あなたが先攻です");

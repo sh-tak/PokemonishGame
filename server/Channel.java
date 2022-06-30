@@ -96,6 +96,8 @@ public class Channel extends Thread {
 			server.removeWaitingPlayer(id);
 			send("対戦相手が見つかりました\n" +
 					"対戦相手は" + opponentName + "です");
+			send(String.valueOf(id));
+			send(String.valueOf(opponentId));
 			send(server.isFirstTurn(id, opponentId) ? "first" : "second");
 
 			// 対戦開始
