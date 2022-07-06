@@ -1,5 +1,5 @@
 
-# Pokemonish Game   [![Badge License]][License]   ![Badge Status]
+# Pokemonish Game   [![Badge License]][License]  
 
 
 *実験ソフトウェア制作用のコード*
